@@ -1,0 +1,4 @@
+﻿<vertical vertical-fit="PreferredSize" pad-bottom="15">
+	<dropdown-list-setting text="Choice One" value="ChoiceOne" choices="AllLightOptions" apply-on-change="True"/>
+	<dropdown-list-setting text="Choice Two" value="ChoiceTwo" choices="AllLightOptions" apply-on-change="True"/>
+</vertical>
