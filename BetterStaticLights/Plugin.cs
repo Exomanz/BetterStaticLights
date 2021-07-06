@@ -3,7 +3,6 @@ using BetterStaticLights.Settings;
 using HarmonyLib;
 using IPA;
 using IPA.Config.Stores;
-using IPA.Loader;
 using IPAConfig = IPA.Config.Config;
 using IPALogger = IPA.Logging.Logger;
 using System.Reflection;
@@ -19,10 +18,9 @@ namespace BetterStaticLights
         internal static Config XConfig { get; private set; }
 
         [Init]
-        public Plugin(IPAConfig iConfig, IPALogger iLogger, PluginMetadata data)
+        public Plugin(IPAConfig iConfig, IPALogger iLogger)
         {
             Config config = iConfig.Generated<Config>();
-            config.Version = data.Version;
             XConfig = config;
             Logger = iLogger;
 
