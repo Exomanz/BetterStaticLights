@@ -1,24 +1,21 @@
-﻿using System.Collections.Generic;
-using System.Reflection.Emit;
-
-namespace BetterStaticLights
+﻿namespace BetterStaticLights
 {
     public class Config
     {
-        public static OpCode opCode1;
-        public static OpCode opCode2;
+        public virtual bool Enabled { get; set; } = true;
+        public virtual int LightSetOne { get; set; } = (int)LightSets.BackTop;
+        public virtual bool UseSecondarySaberColor_SetOne { get; set; } = false;
+        public virtual int LightSetTwo { get; set; } = (int)LightSets.BottomBackSide;
+        public virtual bool UseSecondarySaberColor_SetTwo { get; set; } = false;
 
-        public virtual string Choice1 { get; set; } = "BackTop";
-        public virtual string Choice2 { get; set; } = "BottomBackSide";
-
-        internal static List<object> LightChoices => new List<object>(5)
+        public enum LightSets
         {
-            "BackTop",
-            "RingLights",
-            "LeftLasers",
-            "RightLasers",
-            "BottomBackSide",
-            "Off"
-        };
+            Off = 0,
+            BackTop = 1,
+            RingLights = 2,
+            LeftLasers = 3,
+            RightLasers = 4,
+            BottomBackSide = 5,
+        }
     }
 }

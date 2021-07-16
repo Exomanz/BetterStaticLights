@@ -1,35 +1,58 @@
 ﻿using BeatSaberMarkupLanguage.Attributes;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BetterStaticLights.Settings
 {
     internal class SettingsUI : PersistentSingleton<SettingsUI>
     {
-        static Config Config => Plugin.XConfig;
+        private static Config Config => Plugin.XConfig;
 
-        [UIValue("AllLightOptions")]
-        public List<object> LightChoices = Config.LightChoices;
+        #region Random Stuff
+        public static List<object> LightSets => Enum.GetNames(typeof(Config.LightSets)).ToList<object>();
+#pragma warning disable IDE0051
+        private string ChoiceOne { get; set; } = LightSets[Config.LightSetOne].ToString();
+        private string ChoiceTwo { get; set; } = LightSets[Config.LightSetTwo].ToString();
+#pragma warning restore IDE0051
+        #endregion
 
-        [UIValue("ChoiceOne")]
-        protected string ChoiceOne
+        [UIAction("ApplySetOne")]
+        public void ApplySetOne(string set)
         {
-            get => Config.Choice1;
+            Config.LightSetOne = LightSets.IndexOf(set);
+            Generate();
+        }
+
+        [UIAction("ApplySetTwo")]
+        public void ApplySetTwo(string set)
+        {
+            Config.LightSetTwo = LightSets.IndexOf(set);
+            Generate();
+        }
+
+        [UIValue("ColorForSetOne")]
+        protected bool ColorForSetOne
+        {
+            get => Config.UseSecondarySaberColor_SetOne;
             set
             {
-                Config.Choice1 = value;
-                Plugin.GenerateIL();
+                Config.UseSecondarySaberColor_SetOne = value;
+                Generate();
             }
         }
 
-        [UIValue("ChoiceTwo")]
-        protected string ChoiceTwo
+        [UIValue("ColorForSetTwo")]
+        protected bool ColorForSetTwo
         {
-            get => Config.Choice2;
+            get => Config.UseSecondarySaberColor_SetTwo;
             set
             {
-                Config.Choice2 = value;
-                Plugin.GenerateIL();
+                Config.UseSecondarySaberColor_SetTwo = value;
+                Generate();
             }
         }
+
+        private void Generate() => ILGenerator.Generate();
     }
 }
