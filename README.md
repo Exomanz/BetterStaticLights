@@ -17,6 +17,5 @@ Beat Saber mod that lets you choose which lights you want active when "Static Li
 **_Off_** | Turns off a set of lights
 
 ## Roadpath:
+- Fix backwards functionality for `BackTop` light set
 - Add support for up to all 5 lighting events to be active.
-- Allow for choosing which color you want it to be (according to your Saber ColorScheme).
-- Clean and optimize the code (this is literally just a skeleton in it's current phase).
