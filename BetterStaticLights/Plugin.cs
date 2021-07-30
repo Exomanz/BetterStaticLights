@@ -22,8 +22,6 @@ namespace BetterStaticLights
             Config config = iConfig.Generated<Config>();
             XConfig = config;
             Logger = iLogger;
-
-            ILGenerator.Generate();
         }
 
         [OnEnable]

@@ -1,7 +1,4 @@
 ﻿using BeatSaberMarkupLanguage.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace BetterStaticLights.Settings
 {
@@ -9,50 +6,64 @@ namespace BetterStaticLights.Settings
     {
         private static Config Config => Plugin.XConfig;
 
-        #region Random Stuff
-        public static List<object> LightSets => Enum.GetNames(typeof(Config.LightSets)).ToList<object>();
-#pragma warning disable IDE0051
-        private string ChoiceOne { get; set; } = LightSets[Config.LightSetOne].ToString();
-        private string ChoiceTwo { get; set; } = LightSets[Config.LightSetTwo].ToString();
-#pragma warning restore IDE0051
-        #endregion
-
-        [UIAction("ApplySetOne")]
-        public void ApplySetOne(string set)
+        [UIValue("BackTop")] protected bool BackTop
         {
-            Config.LightSetOne = LightSets.IndexOf(set);
-            Generate();
+            get => Config.BackTop;
+            set => Config.BackTop = value;
         }
 
-        [UIAction("ApplySetTwo")]
-        public void ApplySetTwo(string set)
+        [UIValue("BTSecondary")] protected bool BTSecondary
         {
-            Config.LightSetTwo = LightSets.IndexOf(set);
-            Generate();
+            get => Config.BTSecondaryColor;
+            set => Config.BTSecondaryColor = value;
         }
 
-        [UIValue("ColorForSetOne")]
-        protected bool ColorForSetOne
+        [UIValue("RingLights")] protected bool RingLights
         {
-            get => Config.UseSecondarySaberColor_SetOne;
-            set
-            {
-                Config.UseSecondarySaberColor_SetOne = value;
-                Generate();
-            }
+            get => Config.RingLights;
+            set => Config.RingLights = value;
         }
 
-        [UIValue("ColorForSetTwo")]
-        protected bool ColorForSetTwo
+        [UIValue("RLSecondary")] protected bool RLSecondary
         {
-            get => Config.UseSecondarySaberColor_SetTwo;
-            set
-            {
-                Config.UseSecondarySaberColor_SetTwo = value;
-                Generate();
-            }
+            get => Config.RLSecondaryColor;
+            set => Config.RLSecondaryColor = value;
         }
 
-        private void Generate() => ILGenerator.Generate();
+        [UIValue("LeftLasers")] protected bool LeftLasers
+        {
+            get => Config.LeftLasers;
+            set => Config.LeftLasers = value;
+        }
+
+        [UIValue("LLSecondary")] protected bool LLSecondary
+        {
+            get => Config.LLSecondaryColor;
+            set => Config.LLSecondaryColor = value;
+        }
+
+        [UIValue("RightLasers")] protected bool RightLasers
+        {
+            get => Config.RightLasers;
+            set => Config.RightLasers = value;
+        }
+
+        [UIValue("RLSSecondary")] protected bool RLSSecondary
+        {
+            get => Config.RLSSecondaryColor;
+            set => Config.RLSSecondaryColor = value;
+        }
+
+        [UIValue("BottomBackSide")] protected bool BottomBackSide
+        {
+            get => Config.BottomBackSide;
+            set => Config.BottomBackSide = value;
+        }
+
+        [UIValue("BBSSecondary")] protected bool BBSSecondary
+        {
+            get => Config.BBSSecondaryColor;
+            set => Config.BBSSecondaryColor = value;
+        }
     }
 }

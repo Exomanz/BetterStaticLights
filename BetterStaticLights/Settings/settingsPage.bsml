@@ -1,9 +1,29 @@
-﻿<vertical vertical-fit="PreferredSize" pad-bottom="10">
-	<dropdown-list-setting text="Set One" value="ChoiceOne" apply-on-change="True" choices="LightSets"
-						   on-change="ApplySetOne"/>
-	<checkbox text="Use Secondary Saber Color" value="ColorForSetOne" apply-on-change="True"/>
-	
-	<dropdown-list-setting text="Set Two" value="ChoiceTwo" apply-on-change="True" choices="LightSets"
-						   on-change="ApplySetTwo"/>
-	<checkbox text="Use Secondary Saber Color" value="ColorForSetTwo" apply-on-change="True"/>
+﻿<vertical child-control-height="False" pref-width="80" pad-right="10">
+	<horizontal pad-left="14" spacing="0">
+		<text text="Enable Set" italics="True" font-color="Lime" align="Left"/>
+		<text text="Use Left Saber Color" italics="True" font-color="Orange" align="Right"/>
+	</horizontal>
+	<horizontal spacing="-3" pad-bottom="12">
+		<vertical pref-width="30">
+			<checkbox text="" value="BackTop" apply-on-change="True"/>
+			<checkbox text="" value="RingLights" apply-on-change="True"/>
+			<checkbox text="" value="LeftLasers" apply-on-change="True"/>
+			<checkbox text="" value="RightLasers" apply-on-change="True"/>
+			<checkbox text="" value="BottomBackSide" apply-on-change="True"/>
+		</vertical>
+		<vertical pad-left="10">
+			<text text="BackTop" align="Center" italics="True"/>
+			<text text="RingLights" align="Center" italics="True"/>
+			<text text="LeftLasers" align="Center" italics="True"/>
+			<text text="RightLasers" align="Center" italics="True"/>
+			<text text="BottomBackSide" align="Center" italics="True"/>
+		</vertical>
+		<vertical pref-width="30">
+			<checkbox text="" value="BTSecondary" apply-on-change="True"/>
+			<checkbox text="" value="RLSecondary" apply-on-change="True"/>
+			<checkbox text="" value="LLSecondary" apply-on-change="True"/>
+			<checkbox text="" value="RLSSecondary" apply-on-change="True"/>
+			<checkbox text="" value="BBSSecondary" apply-on-change="True"/>
+		</vertical>
+	</horizontal>
 </vertical>

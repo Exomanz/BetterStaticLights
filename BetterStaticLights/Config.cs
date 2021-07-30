@@ -2,20 +2,20 @@
 {
     public class Config
     {
-        public virtual bool Enabled { get; set; } = true;
-        public virtual int LightSetOne { get; set; } = (int)LightSets.BackTop;
-        public virtual bool UseSecondarySaberColor_SetOne { get; set; } = false;
-        public virtual int LightSetTwo { get; set; } = (int)LightSets.BottomBackSide;
-        public virtual bool UseSecondarySaberColor_SetTwo { get; set; } = false;
+        // Kinda messy at the moment, but this is the easiest way that I found /shrug
+        public virtual bool BackTop { get; set; } = true;
+        public virtual bool BTSecondaryColor { get; set; } = false;
 
-        public enum LightSets
-        {
-            Off = 0,
-            BackTop = 1,
-            RingLights = 2,
-            LeftLasers = 3,
-            RightLasers = 4,
-            BottomBackSide = 5,
-        }
+        public virtual bool RingLights { get; set; } = false;
+        public virtual bool RLSecondaryColor { get; set; } = false;
+
+        public virtual bool LeftLasers { get; set; } = false;
+        public virtual bool LLSecondaryColor { get; set; } = false;
+
+        public virtual bool RightLasers { get; set; } = false;
+        public virtual bool RLSSecondaryColor { get; set; } = false;
+
+        public virtual bool BottomBackSide { get; set; } = true;
+        public virtual bool BBSSecondaryColor { get; set; } = false;
     }
 }
