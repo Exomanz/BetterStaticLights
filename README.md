@@ -16,7 +16,3 @@ Beat Saber mod that lets you choose which lights you want active when "Static Li
 **_BottomBackSide_** | These are going to be your arrow/logo/focal point lasers, as well as the ones **on or near** the track
 **_Off_** | Turns off a set of lights
 **_Use Left Saber Color_** | Allows a set of lights to use the left saber color
-
-## Roadpath:
-- Fix backwards functionality for `BackTop` light set
-  - This is *partially* fixed to the point where it works as expected, but I never changed any base-game behaviour which I'm pretty sure is what causes this to happen.
