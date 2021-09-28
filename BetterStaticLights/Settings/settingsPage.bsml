@@ -1,0 +1,29 @@
+﻿<vertical child-control-height="False" pref-width="80" pad-right="10">
+	<horizontal pad-left="14" spacing="0">
+		<text text="Enable Set" italics="True" font-color="Lime" align="Left"/>
+		<text text="Use Secondary Color" italics="True" font-color="Orange" align="Right"/>
+	</horizontal>
+	<horizontal spacing="-3" pad-bottom="12">
+		<vertical pref-width="30">
+			<checkbox text="" value="back-top-enabled" apply-on-change="True"/>
+			<checkbox text="" value="ring-lights-enabled" apply-on-change="True"/>
+			<checkbox text="" value="left-lasers-enabled" apply-on-change="True"/>
+			<checkbox text="" value="right-lasers-enabled" apply-on-change="True"/>
+			<checkbox text="" value="bottom-back-side-enabled" apply-on-change="True"/>
+		</vertical>
+		<vertical pad-left="10">
+			<text text="BackTop" align="Center" italics="True"/>
+			<text text="RingLights" align="Center" italics="True"/>
+			<text text="LeftLasers" align="Center" italics="True"/>
+			<text text="RightLasers" align="Center" italics="True"/>
+			<text text="BottomBackSide" align="Center" italics="True"/>
+		</vertical>
+		<vertical pref-width="30">
+			<checkbox text="" value="back-top-color" apply-on-change="True"/>
+			<checkbox text="" value="ring-lights-color" apply-on-change="True"/>
+			<checkbox text="" value="left-lasers-color" apply-on-change="True"/>
+			<checkbox text="" value="right-lasers-color" apply-on-change="True"/>
+			<checkbox text="" value="bottom-back-side-color" apply-on-change="True"/>
+		</vertical>
+	</horizontal>
+</vertical>

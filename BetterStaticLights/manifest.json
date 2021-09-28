@@ -1,0 +1,13 @@
+﻿{
+  "$schema": "https://raw.githubusercontent.com/bsmg/BSIPA-MetadataFileSchema/master/Schema.json",
+  "id": "BetterStaticLights",
+  "name": "BetterStaticLights",
+  "author": "Exomanz",
+  "version": "0.0.3",
+  "description": "With static lights on, choose which ones you want to be on!",
+  "gameVersion": "1.16.4",
+  "dependsOn": {
+    "BSIPA": "^4.2.0",
+    "BeatSaberMarkupLanguage": "^1.5.4"
+  }
+}
