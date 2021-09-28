@@ -1,13 +1,15 @@
-﻿using IPA.Config.Stores.Attributes;
-using IPA.Config.Stores.Converters;
-using System.Collections.Generic;
-
-namespace BetterStaticLights
+﻿namespace BetterStaticLights
 {
     public class Config
     {
+        /// <summary>
+        /// Simple class that has information that is used by the <see cref="HarmonyLib.HarmonyPatch"/>
+        /// </summary>
         public class LightSet
         {
+            /// <summary>
+            /// Returns a <see cref="BeatmapEventType"/> based on the name of the <see cref="LightSet"/>
+            /// </summary>
             public BeatmapEventType Type
             {
                 get
@@ -30,22 +32,22 @@ namespace BetterStaticLights
                 }
             }
             /// <summary>
-            /// The name of the LightSet. 
+            /// The name of the <see cref="LightSet"/>. 
             /// </summary>
             public string Name;
             /// <summary>
-            /// Specifies whether the set is enabled.
+            /// Specifies whether the <see cref="LightSet"/> is enabled.
             /// </summary>
             public bool Enabled;
             /// <summary>
-            /// Dictates whether the set uses the secondary environment color.
+            /// Dictates whether the <see cref="LightSet"/> uses the secondary environment color.
             /// </summary>
             public bool UseSecondaryColor;
 
             public LightSet() { }
 
             /// <summary>
-            /// Initializes a new <see cref="LightSet"/> with the specified <paramref name="name"/>, <paramref name="enabled"/> state, and <paramref name="color"/>
+            /// Creates a new <see cref="LightSet"/> with the specified <paramref name="name"/>, <paramref name="enabled"/> state, and <paramref name="useSecondaryColor"/> state.
             /// </summary>
             /// <param name="name"></param>
             /// <param name="useSecondaryColor"></param>
