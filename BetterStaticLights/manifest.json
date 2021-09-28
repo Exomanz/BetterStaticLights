@@ -3,7 +3,7 @@
   "id": "BetterStaticLights",
   "name": "BetterStaticLights",
   "author": "Exomanz",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "With static lights on, choose which ones you want to be on!",
   "gameVersion": "1.18.0",
   "dependsOn": {
