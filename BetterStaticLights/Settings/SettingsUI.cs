@@ -7,12 +7,6 @@ namespace BetterStaticLights.Settings
     {
         private PluginConfig Config => Plugin.Instance.Config;
 
-        [UIValue("version")] 
-        public string Version
-        {
-            get => $"Version: {Plugin.Instance.Metadata.HVersion}";
-        }
-
         [UIValue("bt-enabled")]
         public bool BTEnabled
         {

@@ -14,18 +14,16 @@ namespace BetterStaticLights
     {
         public static Plugin Instance { get; private set; }
 
-        internal readonly PluginMetadata Metadata;
         internal readonly PluginConfig Config;
         internal readonly Harmony harmony;
         internal const string _harmonyId = "bs.Exo.better_lights";
 
         [Init]
-        public Plugin(IPAConfig config, PluginMetadata metadata)
+        public Plugin(IPAConfig config)
         {
             Instance = this;
 
             Config = config.Generated<PluginConfig>();
-            Metadata = metadata;
             harmony = new Harmony(_harmonyId);
         }
 
