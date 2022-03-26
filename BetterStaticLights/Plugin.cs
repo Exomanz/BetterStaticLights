@@ -3,36 +3,52 @@ using BetterStaticLights.Settings;
 using HarmonyLib;
 using IPA;
 using IPA.Config.Stores;
+using IPA.Loader;
 using IPAConfig = IPA.Config.Config;
+using System.Reflection;
 
 namespace BetterStaticLights
 {
     [Plugin(RuntimeOptions.DynamicInit)]
     public class Plugin
     {
-        internal static Config Config { get; private set; }
-        internal static Harmony _Harmony { get; private set; }
-        internal const string Harmony_ID = "bs.Exomanz.bsl";
+        public static Plugin Instance { get; private set; }
+
+        internal readonly PluginMetadata Metadata;
+        internal readonly PluginConfig Config;
+        internal readonly Harmony harmony;
+        internal const string _harmonyId = "bs.Exo.better_lights";
 
         [Init]
-        public Plugin(IPAConfig config)
+        public Plugin(IPAConfig config, PluginMetadata metadata)
         {
-            Config = config.Generated<Config>();
+            Instance = this;
+
+            Config = config.Generated<PluginConfig>();
+            Metadata = metadata;
+            harmony = new Harmony(_harmonyId);
         }
 
         [OnEnable]
         public void Enable()
         {
-            _Harmony = Harmony.CreateAndPatchAll(typeof(HarmonyPatches.NoEffectsTransformPatch), Harmony_ID);
-            GameplaySetup.instance.AddTab("Better Static Lights", "BetterStaticLights.Settings.settingsPage.bsml", SettingsUI.instance);
+            Config.lightSets.Add(Config.BackTop);
+            Config.lightSets.Add(Config.RingLights);
+            Config.lightSets.Add(Config.LeftLasers);
+            Config.lightSets.Add(Config.RightLasers);
+            Config.lightSets.Add(Config.BottomBackSide);
+
+            GameplaySetup.instance.AddTab("Better Static Lights", "BetterStaticLights.Settings.settings.bsml", SettingsUI.instance);
+            harmony.PatchAll(Assembly.GetExecutingAssembly());
         }
 
         [OnDisable]
         public void Disable()
         {
+            Config.lightSets.Clear();
+
             GameplaySetup.instance.RemoveTab("Better Static Lights");
-            _Harmony?.UnpatchSelf();
-            _Harmony = null;
+            harmony.UnpatchSelf();
         }
     }
 }

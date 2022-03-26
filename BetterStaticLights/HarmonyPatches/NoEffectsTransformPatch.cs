@@ -4,43 +4,32 @@ namespace BetterStaticLights.HarmonyPatches
 {
     [HarmonyPatch(typeof(BeatmapDataNoEnvironmentEffectsTransform), MethodType.Normal)]
     [HarmonyPatch("CreateTransformedData")]
-    internal static class NoEffectsTransformPatch
+    internal class NoEffectsTransformPatch
     {
-        private static Config Config => Plugin.Config;
+        public static PluginConfig Config => Plugin.Instance.Config;
 
         [HarmonyPrefix]
         private static bool Prefix(IReadonlyBeatmapData beatmapData, ref IReadonlyBeatmapData __result)
         {
-            BeatmapData copyWithoutEvents = beatmapData.GetCopyWithoutEvents();
-
-            if (Config.BackTop.Enabled)
-                copyWithoutEvents.AddBeatmapEventData(new BeatmapEventData(
-                    0, Config.BackTop.Type, Config.BackTop.UseSecondaryColor ? 1 : 5, 1));
-
-            if (Config.RingLights.Enabled)
-                copyWithoutEvents.AddBeatmapEventData(new BeatmapEventData(
-                    0, Config.RingLights.Type, Config.RingLights.UseSecondaryColor ? 1 : 5, 1));
-
-            if (Config.LeftLasers.Enabled)
-                copyWithoutEvents.AddBeatmapEventData(new BeatmapEventData(
-                    0, Config.LeftLasers.Type, Config.LeftLasers.UseSecondaryColor ? 1 : 5, 1));
-
-            if (Config.RightLasers.Enabled)
-                copyWithoutEvents.AddBeatmapEventData(new BeatmapEventData(
-                    0, Config.RightLasers.Type, Config.RightLasers.UseSecondaryColor ? 1 : 5, 1));
-
-            if (Config.BottomBackSide.Enabled)
-                copyWithoutEvents.AddBeatmapEventData(new BeatmapEventData(
-                    0, Config.BottomBackSide.Type, Config.BottomBackSide.UseSecondaryColor ? 1 : 5, 1));
-
-            foreach (BeatmapEventData beatmapEventsDatum in beatmapData.beatmapEventsData)
+            static BeatmapDataItem ProcessData(BeatmapDataItem beatmapDataItem)
             {
-                if (BeatmapEventTypeExtensions.IsRotationEvent(beatmapEventsDatum.type) ||
-                    BeatmapEventTypeExtensions.IsSpecialEvent(beatmapEventsDatum.type))
+                if (!(beatmapDataItem is BeatmapObjectData) && !(beatmapDataItem is BPMChangeBeatmapEventData) && !(beatmapDataItem is SpawnRotationBeatmapEventData))
                 {
-                    copyWithoutEvents.AddBeatmapEventData(beatmapEventsDatum);
+                    return null;
+                }
+                return beatmapDataItem;
+            }
+
+            BeatmapData copyWithoutEvents = beatmapData.GetFilteredCopy(ProcessData);
+
+            foreach (LightSet set in Config.lightSets)
+            {
+                if (set.Enabled)
+                {
+                    copyWithoutEvents.InsertBeatmapEventData(new BasicBeatmapEventData(0, set.EventType, set.UseSecondaryColor ? 1 : 5, 1));
                 }
             }
+
             __result = copyWithoutEvents;
 
             return false;

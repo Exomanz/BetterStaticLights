@@ -1,0 +1,32 @@
+﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' 
+	xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
+	<vertical child-control-height="False" pref-width="80" pad-right="10">
+		<horizontal pad-left="14" spacing="0">
+			<text text="Enabled" italics="True" font-color="Lime" align="Left"/>
+			<text text="Use Secondary Color" italics="True" font-color="Orange" align="Right"/>
+		</horizontal>
+		<horizontal spacing="-3" pad-bottom="12">
+			<vertical pref-width="30">
+				<checkbox text="" value="bt-enabled" apply-on-change="True"/>
+				<checkbox text="" value="rl-enabled" apply-on-change="True"/>
+				<checkbox text="" value="ll-enabled" apply-on-change="True"/>
+				<checkbox text="" value="ril-enabled" apply-on-change="True"/>
+				<checkbox text="" value="bbs-enabled" apply-on-change="True"/>
+			</vertical>
+			<vertical pad-left="10">
+				<text text="Back Top" align="Center" italics="True"/>
+				<text text="Ring Lights" align="Center" italics="True"/>
+				<text text="Left Lasers" align="Center" italics="True"/>
+				<text text="Right Lasers" align="Center" italics="True"/>
+				<text text="Bottom Back Side" align="Center" italics="True"/>
+			</vertical>
+			<vertical pref-width="30">
+				<checkbox text="" value="bt-secondary" apply-on-change="True"/>
+				<checkbox text="" value="rl-secondary" apply-on-change="True"/>
+				<checkbox text="" value="ll-secondary" apply-on-change="True"/>
+				<checkbox text="" value="ril-secondary" apply-on-change="True"/>
+				<checkbox text="" value="bbs-secondary" apply-on-change="True"/>
+			</vertical>
+		</horizontal>
+	</vertical>
+</bg>

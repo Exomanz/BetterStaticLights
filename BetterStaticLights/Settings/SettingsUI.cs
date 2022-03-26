@@ -1,76 +1,83 @@
 ﻿using BeatSaberMarkupLanguage.Attributes;
+using TMPro;
 
 namespace BetterStaticLights.Settings
 {
     internal class SettingsUI : PersistentSingleton<SettingsUI>
     {
-        private static Config Config => Plugin.Config;
+        private PluginConfig Config => Plugin.Instance.Config;
 
-        [UIValue("back-top-enabled")]
-        protected bool BackTopEnabled
+        [UIValue("version")] 
+        public string Version
+        {
+            get => $"Version: {Plugin.Instance.Metadata.HVersion}";
+        }
+
+        [UIValue("bt-enabled")]
+        public bool BTEnabled
         {
             get => Config.BackTop.Enabled;
             set => Config.BackTop.Enabled = value;
         }
 
-        [UIValue("back-top-color")]
-        protected bool BackTopColor
+        [UIValue("bt-secondary")]
+        public bool BTSecondary
         {
             get => Config.BackTop.UseSecondaryColor;
             set => Config.BackTop.UseSecondaryColor = value;
         }
 
-        [UIValue("ring-lights-enabled")]
-        protected bool RingLightsEnabled
+        [UIValue("rl-enabled")]
+        public bool RLEnabled
         {
             get => Config.RingLights.Enabled;
             set => Config.RingLights.Enabled = value;
         }
 
-        [UIValue("ring-lights-color")]
-        protected bool RingLightsColor
+        [UIValue("rl-secondary")]
+        public bool RLSecondary
         {
             get => Config.RingLights.UseSecondaryColor;
             set => Config.RingLights.UseSecondaryColor = value;
         }
 
-        [UIValue("left-lasers-enabled")]
-        protected bool LeftLaserEnabled
+        [UIValue("ll-enabled")]
+        public bool LLEnabled
         {
             get => Config.LeftLasers.Enabled;
             set => Config.LeftLasers.Enabled = value;
         }
 
-        [UIValue("left-lasers-color")]
-        protected bool LeftLasersColor
+        [UIValue("ll-secondary")]
+        public bool LLSecondary
         {
             get => Config.LeftLasers.UseSecondaryColor;
             set => Config.LeftLasers.UseSecondaryColor = value;
         }
 
-        [UIValue("right-lasers-enabled")]
-        protected bool RightLasersEnabled
+        [UIValue("ril-enabled")]
+        public bool RILEnabled
         {
             get => Config.RightLasers.Enabled;
             set => Config.RightLasers.Enabled = value;
         }
 
-        [UIValue("right-lasers-color")]
-        protected bool RightLasersColor
+        [UIValue("ril-secondary")]
+        public bool RILSecondary
         {
             get => Config.RightLasers.UseSecondaryColor;
             set => Config.RightLasers.UseSecondaryColor = value;
         }
 
-        [UIValue("bottom-back-side-enabled")]
-        protected bool BottomBackSideEnabled
+        [UIValue("bbs-enabled")]
+        public bool BBSEnabled
         {
             get => Config.BottomBackSide.Enabled;
             set => Config.BottomBackSide.Enabled = value;
         }
 
-        [UIValue("bottom-back-side-color")]
-        protected bool BottomBackSideColor
+        [UIValue("bbs-secondary")]
+        public bool BBSSecondary
         {
             get => Config.BottomBackSide.UseSecondaryColor;
             set => Config.BottomBackSide.UseSecondaryColor = value;
