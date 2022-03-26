@@ -7,4 +7,4 @@ Beat Saber mod that lets you choose which lights you want active when "Static Li
 
 ## Preview:
 ### Origins Environment with Left Lasers, Right Lasers and Ring Lights active:
-!["The First" Environment with Left, Right, and Bottom Back Side Lasers Active](https://github.com/Exomanz/BetterStaticLights/blob/master/Resources/preview.jpg) 
+!["The First" Environment with Left, Right, and Bottom Back Side Lasers Active](https://github.com/Exomanz/BetterStaticLights/blob/master/Resources/Preview.jpg) 
