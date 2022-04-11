@@ -123,7 +123,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HarmonyPatches\NoEffectsTransformPatch.cs" />
+    <Compile Include="BeatmapDataNoEnvironmentEffectsTransform.cs" />
+    <Compile Include="CreateTransformedBeatmapDataPatch.cs" />
     <Compile Include="LightSet.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="PluginConfig.cs" />
