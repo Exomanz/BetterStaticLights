@@ -3,9 +3,9 @@
   "id": "BetterStaticLights",
   "name": "BetterStaticLights",
   "author": "Exomanz",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Choose which lights you want active when using 'Static Lights'",
-  "gameVersion": "1.21.0",
+  "gameVersion": "1.24.1",
   "dependsOn": {
     "BSIPA": "^4.2.2",
     "BeatSaberMarkupLanguage": "^1.6.3"

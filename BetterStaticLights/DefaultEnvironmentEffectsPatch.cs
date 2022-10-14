@@ -7,11 +7,11 @@ namespace BetterStaticLights
     {
         internal static PluginConfig Config = Plugin.Instance.Config;
 
-        internal static bool Prefix(ref BeatmapData beatmapData, ref DefaultEnvironmentEvents defaultEnvironmentEvents)
+        internal static bool Prefix(ref BeatmapData beatmapData, ref DefaultEnvironmentEvents defaultEnvironmentEvents, ref EnvironmentLightGroups environmentLightGroups)
         {
             if (defaultEnvironmentEvents == null || defaultEnvironmentEvents.isEmpty)
             {
-                foreach (LightSet lightSet in Config.lightSets)
+                foreach (LightSetV2 lightSet in Config.lightSets)
                 {
                     if (lightSet.Enabled) 
                         beatmapData.InsertBeatmapEventData(new BasicBeatmapEventData(0, lightSet.EventType, lightSet.UseSecondaryColor ? 1 : 5, 1));

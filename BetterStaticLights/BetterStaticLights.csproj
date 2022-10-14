@@ -124,7 +124,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DefaultEnvironmentEffectsPatch.cs" />
-    <Compile Include="LightSet.cs" />
+    <Compile Include="LightSetV2.cs" />
+    <Compile Include="LightSetV3.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="PluginConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

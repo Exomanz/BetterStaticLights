@@ -8,12 +8,12 @@ namespace BetterStaticLights
 {
     internal class PluginConfig
     {
-        [Ignore] internal List<LightSet> lightSets = new List<LightSet>();
+        [Ignore] internal List<LightSetV2> lightSets = new List<LightSetV2>();
 
-        public virtual LightSet BackTop { get; set; } = new LightSet(BasicBeatmapEventType.Event0, false);
-        public virtual LightSet RingLights { get; set; } = new LightSet(BasicBeatmapEventType.Event1, false);
-        public virtual LightSet LeftLasers { get; set; } = new LightSet(BasicBeatmapEventType.Event2, false);
-        public virtual LightSet RightLasers { get; set; } = new LightSet(BasicBeatmapEventType.Event3, false);
-        public virtual LightSet BottomBackSide { get; set; } = new LightSet(BasicBeatmapEventType.Event4, false);
+        public virtual LightSetV2 BackTop { get; set; } = new LightSetV2(BasicBeatmapEventType.Event0, false);
+        public virtual LightSetV2 RingLights { get; set; } = new LightSetV2(BasicBeatmapEventType.Event1, false);
+        public virtual LightSetV2 LeftLasers { get; set; } = new LightSetV2(BasicBeatmapEventType.Event2, false);
+        public virtual LightSetV2 RightLasers { get; set; } = new LightSetV2(BasicBeatmapEventType.Event3, false);
+        public virtual LightSetV2 BottomBackSide { get; set; } = new LightSetV2(BasicBeatmapEventType.Event4, false);
     }
 }

@@ -15,23 +15,13 @@ namespace BetterStaticLights
     {
         public static Plugin Instance { get; private set; }
 
-        internal bool incompatibleVersion = false;
         internal readonly PluginConfig Config;
         internal readonly Harmony harmony;
-        internal const string _harmonyId = "bs.Exo.BetterStaticLights";
+        internal const string _harmonyId = "com.beatsaber.exo.betterstaticlights";
 
         [Init]
         public Plugin(Logger logger, IPAConfig config)
         {
-            if (UnityGame.GameVersion < new AlmostVersion("1.21.0", AlmostVersion.StoredAs.SemVer))
-            {
-                logger.Error("BetterStaticLights is running on an old version of Beat Saber!");
-                logger.Error("Core functionality changed with 1.21.0, so this plugin will not work, and therefore will not initialize.");
-                logger.Error("Please download an older version of the mod to use it on a version prior to 1.21.0.");
-
-                incompatibleVersion = true;
-            }
-
             Instance = this;
 
             Config = config.Generated<PluginConfig>();
@@ -41,8 +31,6 @@ namespace BetterStaticLights
         [OnEnable]
         public void Enable()
         {
-            if (incompatibleVersion) return;
-
             Config.lightSets.Add(Config.BackTop);
             Config.lightSets.Add(Config.RingLights);
             Config.lightSets.Add(Config.LeftLasers);
@@ -56,8 +44,6 @@ namespace BetterStaticLights
         [OnDisable]
         public void Disable()
         {
-            if (incompatibleVersion) return;
-
             Config.lightSets.Clear();
 
             GameplaySetup.instance.RemoveTab("Better Static Lights");
