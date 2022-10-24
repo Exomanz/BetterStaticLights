@@ -1,52 +1,46 @@
-﻿using BeatSaberMarkupLanguage.GameplaySetup;
-using BetterStaticLights.Settings;
+﻿//using BetterStaticLights.Installers;
 using HarmonyLib;
 using IPA;
 using IPA.Config.Stores;
-using IPA.Logging;
-using IPA.Utilities;
-using System.Reflection;
+using SiraUtil.Zenject;
+using UnityEngine;
 using IPAConfig = IPA.Config.Config;
+using IPALogger = IPA.Logging.Logger;
 
 namespace BetterStaticLights
 {
-    [Plugin(RuntimeOptions.DynamicInit)]
+    [Plugin(RuntimeOptions.DynamicInit), NoEnableDisable]
     public class Plugin
     {
         public static Plugin Instance { get; private set; }
-
         internal readonly PluginConfig Config;
-        internal readonly Harmony harmony;
-        internal const string _harmonyId = "com.beatsaber.exo.betterstaticlights";
+        internal const string _harmonyID= "com.beatsaber.exomanz.betterstaticlights";
+        internal readonly Harmony harmony = new(_harmonyID);
+        internal IPALogger Logger;
 
         [Init]
-        public Plugin(Logger logger, IPAConfig config)
+        public Plugin(IPAConfig config, IPALogger logger, Zenjector zenjector)
         {
             Instance = this;
-
             Config = config.Generated<PluginConfig>();
-            harmony = new Harmony(_harmonyId);
+            Logger = logger;
+
+            zenjector.UseLogger(logger);
         }
 
         [OnEnable]
         public void Enable()
         {
-            Config.lightSets.Add(Config.BackTop);
-            Config.lightSets.Add(Config.RingLights);
-            Config.lightSets.Add(Config.LeftLasers);
-            Config.lightSets.Add(Config.RightLasers);
-            Config.lightSets.Add(Config.BottomBackSide);
-
-            GameplaySetup.instance.AddTab("Better Static Lights", "BetterStaticLights.Settings.settings.bsml", SettingsUI.instance);
-            harmony.PatchAll(Assembly.GetExecutingAssembly());
+#if DEBUG
+            GAMEOBJECTNAMEGETTER DEBUG = new GameObject("NAMEGETTER").AddComponent<GAMEOBJECTNAMEGETTER>();
+            Object.DontDestroyOnLoad(DEBUG);
+#endif
+            harmony.PatchAll(System.Reflection.Assembly.GetExecutingAssembly());
         }
 
         [OnDisable]
         public void Disable()
         {
-            Config.lightSets.Clear();
-
-            GameplaySetup.instance.RemoveTab("Better Static Lights");
             harmony.UnpatchSelf();
         }
     }
