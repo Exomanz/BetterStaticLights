@@ -1,6 +1,4 @@
 ﻿using HarmonyLib;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -8,11 +6,11 @@ namespace BetterStaticLights
 {
     [HarmonyPatch(typeof(DefaultEnvironmentEventsFactory), nameof(DefaultEnvironmentEventsFactory.InsertDefaultEnvironmentEvents), MethodType.Normal)]
     internal class PATCHER
-    {
-        [HarmonyPrefix]
+    {/*
+      * [HarmonyPrefix]
         public static bool Prefix(ref DefaultEnvironmentEvents defaultEnvironmentEvents, ref BeatmapEventDataBoxGroupLists beatmapEventDataBoxGroupLists, EnvironmentLightGroups environmentLightGroups)
         {
-            var groupList = environmentLightGroups.lightGroupDataList;
+            var groupList = environmentLightGroups.lightGroupSOList;
             for (int i = 0; i < groupList.Count; i++)
             {
                 BeatmapEventDataBoxGroup boxGroup = BeatmapEventDataBoxGroupFactory.CreateSingleLightBeatmapEventDataBoxGroup(0, groupList[i].numberOfElements, EnvironmentColorType.Color1, 1, 0, 0);
@@ -20,7 +18,7 @@ namespace BetterStaticLights
             }
 
             return false;
-        }
+        }*/
     }
 
     public class GAMEOBJECTNAMEGETTER : MonoBehaviour

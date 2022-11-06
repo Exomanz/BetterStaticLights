@@ -1,0 +1,41 @@
+﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+	xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ 
+	https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
+	<vertical child-control-height='False'>
+		<vertical vertical-fit='PreferredSize'
+				  pref-width='110'
+				  spacing='5'>
+			<text text='Welcome to &lt;color=#FFA555&gt;BetterStaticLights&lt;/color&gt;&#xA;A Highly Customizable Lighting Mod'
+				  align='Top'
+				  font-size='6'/>
+			<text text='----------'
+				  bold='True'
+				  align='Center'/>
+		</vertical>
+		<vertical vertical-fit='PreferredSize'
+				  ignore-layout='True'
+				  anchor-pos-y='-4'>
+			<vertical vertical-fit='PreferredSize'
+					  bg='panel-top'
+					  pref-width='90'
+					  pad='2'>
+				<text text=': Choose a Category :'
+					  align='Top'
+					  italics='True'
+					  font-size='5'/>
+				<horizontal>
+					<button text='V2 Environments'
+							hover-hint='Settings for the V2 Environments, including &apos;The First&apos;, &apos;Big Mirror&apos;, etc.'
+							pref-width='35'
+							face-color='#44FF00'
+							on-click='v2-button-click'/>
+					<button text='V3 Environments'
+							hover-hint='Settings for the V3 Environments, including &apos;Weave&apos;, &apos;Fall Out Boy&apos;, etc.'
+							pref-width='35'
+							face-color='#44FFFF'
+							on-click='v3-button-click'/>
+				</horizontal>
+			</vertical>
+		</vertical>
+	</vertical>
+</bg>

@@ -4,15 +4,15 @@ using IPA.Config.Stores.Converters;
 namespace BetterStaticLights.Helpers
 {
     /// <summary>
-    /// Helper class which allows for easy population of Beatmap Values
+    /// Helper class which allows for easy population of Beatmap Events on V2 Legacy Environments
     /// </summary>
     internal class LightSetV2
     {
         public bool enabled { get; internal set; }
+        public bool useSecondaryColor { get; internal set; }
 
         [UseConverter(typeof(EnumConverter<BasicBeatmapEventType>))]
-        public BasicBeatmapEventType eventType { get; }
-        public bool useSecondaryColor { get; internal set; }
+        public readonly BasicBeatmapEventType eventType;
 
         public LightSetV2() { }
 

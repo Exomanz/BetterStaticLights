@@ -1,0 +1,84 @@
+﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+	xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ 
+	https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
+	<vertical>
+		<horizontal pref-width='110'>
+			<vertical pref-width='45'>
+				<vertical bg='panel-top'
+						  pref-width='52'
+						  vertical-fit='PreferredSize'
+						  pad-top='1'>
+					<text text='Why V2?'
+						  align='Center'
+						  italics='True'
+						  font-size='4'/>
+				</vertical>
+				<text text='In an effort to make the Beat Saber lighting system more extensible, Beat Games
+revamped the structure of environment lighting starting with the release of &lt;color=#FF8888&gt;OST V&lt;/color&gt;
+and the &apos;&lt;color=#88FF88&gt;Weave&lt;/color&gt;&apos; environment. These older environments
+are referred to as &apos;&lt;color=#88FFFF&gt;V2&lt;/color&gt;&apos; environments.'
+					  align='Top'/>
+			</vertical>
+			<vertical>
+				<vertical bg='panel-top'
+						  pref-width='52'
+						  vertical-fit='PreferredSize'
+						  pad-top='1'>
+					<text text='V2 Environments List'
+						  align='Center'
+						  italics='True'
+						  font-size='4'/>
+				</vertical>
+				<scrollable-settings-container spacing='-45'
+											   pref-height='50'
+											   child-control-height='False'
+											   child-align='UpperCenter'>
+					<text text='The First'
+						  align='Top'/>
+					<text text='Origins'
+						  align='Top'/>
+					<text text='Triangle'
+						  align='Top'/>
+					<text text='Nice'
+						  align='Top'/>
+					<text text='Big Mirror'
+						  align='Top'/>
+					<text text='Dragons'
+						  align='Top'/>
+					<text text='KDA'
+						  align='Top'/>
+					<text text='Monstercat'
+						  align='Top'/>
+					<text text='Crab Rave'
+						  align='Top'/>
+					<text text='Panic'
+						  align='Top'/>
+					<text text='Rocket'
+						  align='Top'/>
+					<text text='Green Day/Grenade'
+						  align='Top'/>
+					<text text='Timbaland'
+						  align='Top'/>
+					<text text='Fit Beat'
+						  align='Top'/>
+					<text text='Linkin Park'
+						  align='Top'/>
+					<text text='BTS'
+						  align='Top'/>
+					<text text='Kaleidoscope'
+						  align='Top'/>
+					<text text='Interscope'
+						  align='Top'/>
+					<text text='Skrillex'
+						  align='Top'/>
+					<text text='Billie'
+						  align='Top'/>
+					<text text='Spooky'
+						  align='Top'/>
+					<text text='Gaga'
+						  align='Top'/>
+				</scrollable-settings-container>
+			</vertical>
+		</horizontal>
+	</vertical>
+</bg>

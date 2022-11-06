@@ -1,0 +1,56 @@
+﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+	xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ 
+	https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
+
+	<text text='Enabled'
+		  anchor-pos-x='104'
+		  italics='True'
+		  face-color='#00FF00'/>
+	<text text='Use Secondary Color'
+		  anchor-pos-x='118'
+		  italics='True'
+		  face-color='#00FFFF'/>
+	<horizontal anchor-pos-x='-11' 
+				horizontal-fit='MinSize'>
+		<vertical pref-width='60'>
+			<checkbox text='Back : Top' 
+					  value='back-enabled'
+					  apply-on-change='True'/>
+			<checkbox text='Ring Lights'
+					  value='ring-enabled'
+					  apply-on-change='True'/>
+			<checkbox text='Left Lasers'
+					  value='left-enabled'
+					  apply-on-change='True'/>
+			<checkbox text='Right Lasers'
+					  value='right-enabled'
+					  apply-on-change='True'/>
+			<checkbox text='Bottom : Back : Side'
+					  value='bottom-enabled'
+					  apply-on-change='True'/>
+		</vertical>
+		<vertical ignore-layout='True'
+				  anchor-pos-x='52'>
+			<checkbox text='' 
+					  pref-width='0'
+					  value='back-secondary'
+					  apply-on-change='True'/>
+			<checkbox text=''
+					  pref-width='0'
+					  value='ring-secondary'
+					  apply-on-change='True'/>
+			<checkbox text=''
+					  pref-width='0'
+					  value='left-secondary'
+					  apply-on-change='True'/>
+			<checkbox text=''
+					  pref-width='0'
+					  value='right-secondary'
+					  apply-on-change='True'/>
+			<checkbox text=''
+					  pref-width='0'
+					  value='bottom-secondary'
+					  apply-on-change='True'/>
+		</vertical>
+	</horizontal>
+</bg>

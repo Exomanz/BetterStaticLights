@@ -138,9 +138,17 @@
     <Compile Include="DEBUG.cs" />
     <Compile Include="Helpers\EnvironmentLightMaps.cs" />
     <Compile Include="Helpers\LightSetV2.cs" />
+    <Compile Include="Installers\BSLMenuInstaller.cs" />
+    <Compile Include="Patches\V2BeatmapEnvironmentLightPatcher.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="PluginConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\FlowCoordinators\BSLParentFlowCoordinator.cs" />
+    <Compile Include="UI\FlowCoordinators\EnvironmentSettingsV2FlowCoordinator.cs" />
+    <Compile Include="UI\MenuButtonManager.cs" />
+    <Compile Include="UI\ViewControllers\MainBSLViewController.cs" />
+    <Compile Include="UI\ViewControllers\V2\V2LightSettingsViewController.cs" />
+    <Compile Include="UI\ViewControllers\V2\V2InfoViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="manifest.json" />
@@ -149,6 +157,9 @@
     <None Include="Directory.Build.props" Condition="Exists('Directory.Build.props')" />
     <None Include="Directory.Build.targets" Condition="Exists('Directory.Build.targets')" />
     <None Include="BetterStaticLights.csproj.user" Condition="Exists('BetterStaticLights.csproj.user')" />
+    <EmbeddedResource Include="UI\BSML\home.bsml" />
+    <EmbeddedResource Include="UI\BSML\v2info.bsml" />
+    <EmbeddedResource Include="UI\BSML\v2settings.bsml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BeatSaberModdingTools.Tasks">
@@ -159,6 +170,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="EnvironmentLightGroupMappings.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="UI\ViewControllers\V3\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
