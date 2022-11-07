@@ -1,5 +1,5 @@
 ﻿//using BetterStaticLights.Installers;
-using BetterStaticLights.Helpers;
+using BetterStaticLights.Configuration;
 using BetterStaticLights.Installers;
 using HarmonyLib;
 using IPA;

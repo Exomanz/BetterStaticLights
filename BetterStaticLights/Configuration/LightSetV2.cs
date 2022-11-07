@@ -1,7 +1,7 @@
 ﻿using IPA.Config.Stores.Attributes;
 using IPA.Config.Stores.Converters;
 
-namespace BetterStaticLights.Helpers
+namespace BetterStaticLights.Configuration
 {
     /// <summary>
     /// Helper class which allows for easy population of Beatmap Events on V2 Legacy Environments

@@ -1,10 +1,10 @@
-﻿using BetterStaticLights.Helpers;
+﻿using BetterStaticLights.Configuration;
 using HarmonyLib;
 
 namespace BetterStaticLights.Patches
 {
     [HarmonyPatch(typeof(DefaultEnvironmentEventsFactory), nameof(DefaultEnvironmentEventsFactory.InsertDefaultEnvironmentEvents), MethodType.Normal)]
-    internal class V2BeatmapEnvironmentLightPatcher
+    internal class V2EnvironmentLightPatcher
     {
         private static PluginConfig Config = Plugin.Instance.Config;
 

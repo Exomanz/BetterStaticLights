@@ -135,11 +135,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\LightSetV3.cs" />
     <Compile Include="DEBUG.cs" />
-    <Compile Include="Helpers\EnvironmentLightMaps.cs" />
-    <Compile Include="Helpers\LightSetV2.cs" />
+    <Compile Include="Configuration\EnvironmentLightMappings.cs" />
+    <Compile Include="Configuration\LightSetV2.cs" />
     <Compile Include="Installers\BSLMenuInstaller.cs" />
-    <Compile Include="Patches\V2BeatmapEnvironmentLightPatcher.cs" />
+    <Compile Include="Patches\V2EnvironmentLightPatcher.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="PluginConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -172,6 +173,7 @@
     <None Include="EnvironmentLightGroupMappings.md" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Helpers\" />
     <Folder Include="UI\ViewControllers\V3\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

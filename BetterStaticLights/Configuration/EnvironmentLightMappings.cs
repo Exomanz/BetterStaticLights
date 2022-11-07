@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace BetterStaticLights.Helpers
+namespace BetterStaticLights.Configuration
 {
-    internal class EnvironmentLightMaps
+    internal class EnvironmentLightMappings
     {
         internal class EnvironmentLightMapData
         {

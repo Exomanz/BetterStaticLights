@@ -1,4 +1,4 @@
-﻿using BetterStaticLights.Helpers;
+﻿using BetterStaticLights.Configuration;
 using IPA.Config.Stores;
 using IPA.Config.Stores.Attributes;
 using System.Collections.Generic;
@@ -22,6 +22,20 @@ namespace BetterStaticLights
         #endregion
 
         #region V3
+        internal class V3EnvironmentConfigurationData
+        { 
+            public string mapName { get; }
+            public LightSetV3[] lightSets { get; }
+
+            public V3EnvironmentConfigurationData() { }
+
+            internal V3EnvironmentConfigurationData(string mapName, LightSetV3[] lightSets)
+            {
+                this.mapName = mapName;
+                this.lightSets = lightSets;
+            }
+        }
+
         [Ignore]
         internal readonly List<string> V3Environments = new()
         {
@@ -32,6 +46,25 @@ namespace BetterStaticLights
             "Lizzo"
         };
 
+        public virtual V3EnvironmentConfigurationData WeaveConfigurationData { get; set; } = new V3EnvironmentConfigurationData("Weave", new LightSetV3[16]
+        {
+            new LightSetV3(true, 0, brightness: 0.05f),
+            new LightSetV3(true, 1, brightness: 0.1f),
+            new LightSetV3(true, 2, brightness: 0.15f),
+            new LightSetV3(true, 3, brightness: 0.20f),
+            new LightSetV3(true, 4, brightness: 0.25f),
+            new LightSetV3(true, 5, brightness: 0.30f),
+            new LightSetV3(true, 6, brightness: 0.35f),
+            new LightSetV3(true, 7, brightness : 0.40f),
+            new LightSetV3(true, 8, brightness : 0.45f),
+            new LightSetV3(true, 9, brightness : 0.50f),
+            new LightSetV3(true, 10, brightness : 0.55f),
+            new LightSetV3(true, 11, brightness : 0.60f),
+            new LightSetV3(true, 12, brightness : 0.65f),
+            new LightSetV3(true, 13, brightness : 0.70f),
+            new LightSetV3(true, 14, brightness : 0.75f),
+            new LightSetV3(true, 15, brightness : 0.80f),
+        });
         #endregion
     }
 }
