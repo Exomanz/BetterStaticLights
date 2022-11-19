@@ -2,7 +2,10 @@
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.ViewControllers;
 using BetterStaticLights.UI.FlowCoordinators;
+using BetterStaticLights.Utils;
+using IPA.Utilities;
 using SiraUtil.Logging;
+using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
@@ -14,8 +17,11 @@ namespace BetterStaticLights.UI.ViewControllers
     {
         [Inject] private readonly BSLParentFlowCoordinator parentFlowCoordinator;
         [Inject] private readonly GameScenesManager gameScenesManager;
+        [Inject] private readonly MenuTransitionsHelper transitionsHelper;
+        [Inject] private readonly PlayerDataModel dataModel;
 
         [Inject] private readonly EnvironmentSettingsV2FlowCoordinator v2FlowCoordinator;
+        [Inject] private readonly EnvironmentSettingsV3FlowCoordinator v3FlowCoordinator;
 
         [Inject] private readonly SiraLog logger;
 
@@ -42,6 +48,12 @@ namespace BetterStaticLights.UI.ViewControllers
                     break;
 
                 case "V3":
+                    var customSetupData = ScriptableObject.CreateInstance<CustomSceneTransitionSetupDataSO>();
+                    customSetupData.Init(this.dataModel.playerData.colorSchemesSettings, "Weave");
+
+                    gameScenesManager.MarkSceneAsPersistent("MenuCore");
+                    gameScenesManager.PushScenes(customSetupData, 0.25f);
+                    parentFlowCoordinator.PresentFlowCoordinator(v3FlowCoordinator, null);
                     break;
 
                 default:

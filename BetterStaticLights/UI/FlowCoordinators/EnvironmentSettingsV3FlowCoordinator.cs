@@ -1,23 +1,22 @@
 ﻿using BeatSaberMarkupLanguage;
-using BetterStaticLights.UI.ViewControllers.V2;
+using BetterStaticLights.UI.ViewControllers.V3;
 using HMUI;
 using Zenject;
 
 namespace BetterStaticLights.UI.FlowCoordinators
 {
-    internal class EnvironmentSettingsV2FlowCoordinator : FlowCoordinator
+    internal class EnvironmentSettingsV3FlowCoordinator : FlowCoordinator
     {
         [Inject] private readonly BSLParentFlowCoordinator parentFlowCoordinator;
-        [Inject] private readonly V2LightSettingsViewController settingsView;
-        [Inject] private readonly V2InfoViewController v2InfoView;
+        [Inject] private readonly V3LightSettingsViewController settingsViewController;
 
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
             if (firstActivation)
             {
-                this.SetTitle("Environment Settings - V2");
+                this.SetTitle("Environment Settings - V3");
                 this.showBackButton = true;
-                base.ProvideInitialViewControllers(settingsView, v2InfoView);
+                base.ProvideInitialViewControllers(settingsViewController);
             }
         }
 

@@ -1,9 +1,11 @@
 ﻿//using BetterStaticLights.Installers;
 using BetterStaticLights.Configuration;
 using BetterStaticLights.Installers;
+using BetterStaticLights.Patches;
 using HarmonyLib;
 using IPA;
 using IPA.Config.Stores;
+using SiraUtil.Logging;
 using SiraUtil.Zenject;
 using System.Collections.Generic;
 using UnityEngine;
@@ -34,6 +36,15 @@ namespace BetterStaticLights
                 Container.Bind<PluginConfig>().FromInstance(this.Config).AsCached();
             });
             zenjector.Install<BSLMenuInstaller>(Location.Menu);
+            zenjector.Install<EnvironmentSceneSetup>((Container) =>
+            {
+                var environmentInfo = Container.TryResolve<EnvironmentSceneSetupData>();
+                if (environmentInfo != null)
+                {
+                    EnvironmentInfoSO info = environmentInfo.environmentInfo;
+                    Container.Bind<V3EnvironmentLightOverrides>().FromNewComponentOn(new GameObject("LightOverrides")).AsSingle().WithArguments(info).NonLazy();
+                }
+            });
         }
 
         [OnEnable]

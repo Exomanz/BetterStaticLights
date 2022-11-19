@@ -22,6 +22,7 @@ namespace BetterStaticLights
         #endregion
 
         #region V3
+
         internal class V3EnvironmentConfigurationData
         { 
             public string mapName { get; }
@@ -35,16 +36,6 @@ namespace BetterStaticLights
                 this.lightSets = lightSets;
             }
         }
-
-        [Ignore]
-        internal readonly List<string> V3Environments = new()
-        {
-            "Weave",
-            "Fall Out Boy",
-            "EDM",
-            "The Second",
-            "Lizzo"
-        };
 
         public virtual V3EnvironmentConfigurationData WeaveConfigurationData { get; set; } = new V3EnvironmentConfigurationData("Weave", new LightSetV3[16]
         {
