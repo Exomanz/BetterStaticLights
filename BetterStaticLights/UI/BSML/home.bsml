@@ -33,9 +33,47 @@
 							hover-hint='Settings for the V3 Environments, including &apos;Weave&apos;, &apos;Fall Out Boy&apos;, etc.'
 							pref-width='35'
 							face-color='#44FFFF'
-							on-click='v3-button-click'/>
+							click-event='show-scene-load-modal'/>
 				</horizontal>
 			</vertical>
 		</vertical>
+		
+		<modal move-to-center='True'
+			   size-delta-x='95'
+			   size-delta-y='55'
+			   pad='3'
+			   show-event='show-scene-load-modal'
+			   hide-event='hide-all'
+			   click-off-closes='True'>
+			<vertical>
+				<vertical vertical-fit='PreferredSize'
+						  pref-width='75'
+						  bg='panel-top'
+						  pad='2'
+						  child-expand-height='False'>
+					<text text='V3 Environment Previewer'
+						  font-size='7'
+						  italics='True'
+						  align='Top'/>
+				</vertical>
+				<text text='Select an Environment to Preview'
+					  align='Top'
+					  font-size='5'/>
+				<horizontal>
+					<button text='Back'
+							face-color='#FF4444'
+							click-event='hide-all'/>
+					<button text='Confirm'
+							face-color='#44FF44'
+							on-click='v3-button-click'/>
+				</horizontal>
+			</vertical>
+
+			<list-setting id='v3-list'
+						  text=''
+						  choices='v3-environment-list'
+						  value='temp-value'
+						  ignore-layout='True'/>
+		</modal>
 	</vertical>
 </bg>

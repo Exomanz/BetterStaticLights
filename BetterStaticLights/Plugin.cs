@@ -9,6 +9,7 @@ using SiraUtil.Logging;
 using SiraUtil.Zenject;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using IPAConfig = IPA.Config.Config;
 using IPALogger = IPA.Logging.Logger;
 
@@ -20,7 +21,7 @@ namespace BetterStaticLights
         public static Plugin Instance { get; private set; }
 
         internal readonly PluginConfig Config;
-        internal readonly Harmony harmony = new("com.beatsaber.exo.betterstaticlights");
+        internal readonly Harmony harmony = new Harmony("com.beatsaber.exo.betterstaticlights");
         internal IPALogger Logger;
 
         [Init]
@@ -42,6 +43,13 @@ namespace BetterStaticLights
                 if (environmentInfo != null)
                 {
                     EnvironmentInfoSO info = environmentInfo.environmentInfo;
+#if DEBUG
+                    foreach (Scene scene in SceneManager.GetAllScenes())
+                    {
+                        logger.Info(scene.name);
+                    }
+#endif
+                    logger.Info(info.sceneInfo.sceneName);
                     Container.Bind<V3EnvironmentLightOverrides>().FromNewComponentOn(new GameObject("LightOverrides")).AsSingle().WithArguments(info).NonLazy();
                 }
             });
@@ -54,18 +62,18 @@ namespace BetterStaticLights
             GAMEOBJECTNAMEGETTER DEBUG = new GameObject("NAMEGETTER").AddComponent<GAMEOBJECTNAMEGETTER>();
             Object.DontDestroyOnLoad(DEBUG);
 #endif
-            this.PopulateLightSetList();
+            this.PopulateV2LightSetList();
             harmony.PatchAll(System.Reflection.Assembly.GetExecutingAssembly());
         }
 
         [OnDisable]
         public void Disable()
         {
-            this.PopulateLightSetList(false);
+            this.PopulateV2LightSetList(false);
             harmony.UnpatchSelf();
         }
 
-        private void PopulateLightSetList(bool state = true)
+        private void PopulateV2LightSetList(bool state = true)
         {
             List<LightSetV2> setList = Config.lightSets;
 

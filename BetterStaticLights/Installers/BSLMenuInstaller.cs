@@ -18,9 +18,12 @@ namespace BetterStaticLights.Installers
             Container.Bind<EnvironmentSettingsV3FlowCoordinator>().FromNewComponentOn(new GameObject("BSL - V3 Settings FlowCoordinator")).AsSingle();
 
             BindViewController<MainBSLViewController>();
+            
             BindViewController<V2LightSettingsViewController>();
             BindViewController<V2InfoViewController>();
+
             BindViewController<V3LightSettingsViewController>();
+            BindViewController<V3ActiveSceneSettingsMenu>();
 
             Container.BindInterfacesAndSelfTo<MenuButtonManager>().AsSingle().NonLazy();
         }

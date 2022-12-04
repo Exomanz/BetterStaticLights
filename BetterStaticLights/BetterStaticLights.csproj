@@ -153,8 +153,8 @@
     <Compile Include="UI\ViewControllers\MainBSLViewController.cs" />
     <Compile Include="UI\ViewControllers\V2\V2LightSettingsViewController.cs" />
     <Compile Include="UI\ViewControllers\V2\V2InfoViewController.cs" />
+    <Compile Include="UI\ViewControllers\V3\V3ActiveSceneSettingsMenu.cs" />
     <Compile Include="UI\ViewControllers\V3\V3LightSettingsViewController.cs" />
-    <Compile Include="Utils\CustomSceneTransitionSetupDataSO.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="manifest.json" />

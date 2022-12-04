@@ -15,8 +15,6 @@ namespace BetterStaticLights.Patches
         [HarmonyPrefix]
         public static bool Prefix(ref DefaultEnvironmentEvents defaultEnvironmentEvents, ref BeatmapEventDataBoxGroupLists beatmapEventDataBoxGroupLists, ref EnvironmentLightGroups environmentLightGroups)
         {
-            return true;
-
             for (int i = 0; i < environmentLightGroups.lightGroupSOList.Count; i++)
             {
                 var boxGroup = BeatmapEventDataBoxGroupFactory.CreateSingleLightBeatmapEventDataBoxGroup(0, environmentLightGroups.lightGroupSOList[i].numberOfElements, defaultEnvironmentEvents.lightGroupEvents[0]);
