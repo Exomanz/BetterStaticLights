@@ -25,12 +25,154 @@ namespace BetterStaticLights.UI.ViewControllers
     [HotReload(RelativePathToLayout = @"../BSML/home.bsml")]
     public class MainBSLViewController : BSMLAutomaticViewController
     {
+        internal class MockSceneTransitionHelper : IDisposable
+        {
+            internal Dictionary<string, string> sceneToNormalizedNames = new Dictionary<string, string>()
+            {
+                { "WeaveEnvironment", "Weave" },
+                { "PyroEnvironment", "Fall Out Boy" },
+                { "EDMEnvironment", "EDM" },
+                { "TheSecondEnvironment", "The Second" },
+                { "LizzoEnvironment", "Lizzo"},
+                { "TheWeekndEnvironment", "The Weeknd" },
+            };
+
+            internal Dictionary<string, string> normalizedToSceneNames = new Dictionary<string, string>()
+            {
+                { "Weave", "WeaveEnvironment" },
+                { "Fall Out Boy", "PyroEnvironment" },
+                { "EDM", "EDMEnvironment" },
+                { "The Second", "TheSecondEnvironment" },
+                { "Lizzo", "LizzoEnvironment" },
+                { "The Weeknd", "TheWeekndEnvironment" },
+            };
+
+            private SiraLog logger = null;
+            private MainBSLViewController mainViewController = null;
+            private List<GameObject> mockSceneObjects = new List<GameObject>();
+            private bool hasCopiedEnvironmentElements = false;
+
+            public MockSceneTransitionHelper(SiraLog logger, MainBSLViewController viewControllerInstance)
+            {
+                this.logger = logger;
+                this.mainViewController = viewControllerInstance;
+            }
+
+            public string GetNormalizedSceneName(string sceneName)
+            {
+                sceneToNormalizedNames.TryGetValue(sceneName, out string value);
+                return value;
+            }
+
+            public string GetSerializableSceneName(string sceneName)
+            {
+                normalizedToSceneNames.TryGetValue(sceneName, out string value);
+                return value;
+            }
+
+            public IEnumerator EnvironmentPreviewRoutine(bool isEnteringPreviewState, string environmentName = "WeaveEnvironment", bool shouldEnvironmentChange = false)
+            {
+                logger.Logger.Info($"{isEnteringPreviewState}, {environmentName}, {shouldEnvironmentChange}");
+
+                if (string.IsNullOrWhiteSpace(environmentName))
+                {
+                    mainViewController.config.nextPreviewEnvironment = "WeaveEnvironment";
+                    throw new ArgumentException($"Illegal argument given for {environmentName}. Defaulting to 'WeaveEnvironment'", environmentName);
+                }
+
+                if (isEnteringPreviewState)
+                {
+                    if (!hasCopiedEnvironmentElements)
+                    {
+                        GameObject listParent;
+                        if (GameObject.Find("== BSL MOCK OBJECTS ==") == null)
+                            listParent = new GameObject("== BSL MOCK OBJECTS ==");
+                        else listParent = GameObject.Find("== BSL MOCK OBJECTS ==");
+                        GameObject environmentSceneWrapper = null!;
+                        GameObject gameCoreSceneWrapper = null!;
+
+                        int easterEggInt = 0;
+
+                        AsyncOperation envOp = SceneManager.LoadSceneAsync(environmentName, LoadSceneMode.Additive);
+                        AsyncOperation gameCoreOp = SceneManager.LoadSceneAsync("GameCore", LoadSceneMode.Additive);
+                        while (!gameCoreOp.isDone && !envOp.isDone)
+                        {
+                            if (easterEggInt == 0)
+                                logger.Logger.Debug("Hey! You found a secret debug message because I needed to add just a *little* bit more processing time before the 'WaitForFixedUpdate()' calls. Seriously! If I omit this log, the method won't work properly and the transition will break. That's why this is here, so consider this a little Easter Egg from me.");
+                            easterEggInt++;
+                            yield return new WaitForFixedUpdate();
+                        }
+
+                        environmentSceneWrapper = Resources.FindObjectsOfTypeAll<EnvironmentSceneSetup>()[0]?.transform.parent.gameObject;
+                        gameCoreSceneWrapper = Resources.FindObjectsOfTypeAll<GameCoreSceneSetup>()[0]?.transform.parent.gameObject;
+
+                        GameObject mockSkyboxBloom = gameCoreSceneWrapper.transform.Find("BloomSkyboxQuad").gameObject;
+                        mockSkyboxBloom = Instantiate(mockSkyboxBloom.gameObject, mainViewController.transform.parent, true);
+                        mockSkyboxBloom.gameObject.name = "BSLMock - BloomSkyboxQuad";
+                        mockSkyboxBloom.transform.SetParent(listParent.transform);
+                        mockSceneObjects.Add(mockSkyboxBloom);
+
+                        switch (environmentName)
+                        {
+                            /// TODO: 
+                            /// Add environment-specific mock objects so that the previews are more accurate to the game.
+                            /// Figure out why the PlayersPlace shaders aren't working the right way
+                            /// Add a 1-second timeout on Confirmation to load everything and prevent exceptions (this happens a lot more than it should).
+                            /// Clean up... but holy fuck I'm glad this works.
+                        }
+
+                        foreach (LightGroup group in environmentSceneWrapper.GetComponentsInChildren<LightGroup>())
+                        {
+                            GameObject mockGroup = Instantiate(group.gameObject, mainViewController.transform.parent, true);
+                            mockGroup.name = $"BSLMock - {group.name}";
+                            mockGroup.transform.SetParent(listParent.transform);
+
+                            mockSceneObjects.Add(mockGroup);
+                        }
+
+                        GameObject mockPlayersPlace = environmentSceneWrapper.transform.Find("PlayersPlace")?.gameObject;
+                        for (int i = 0; i < mockPlayersPlace.transform.childCount; i++)
+                        {
+                            GameObject playersPlaceObject = Instantiate(mockPlayersPlace.transform.GetChild(i).gameObject);
+                            playersPlaceObject.name = "BSLMock - " + playersPlaceObject.name.Trim('(');
+                            playersPlaceObject.transform.SetParent(listParent.transform);
+
+                            mockSceneObjects.Add(playersPlaceObject);
+                        }
+
+                        SceneManager.UnloadSceneAsync("GameCore", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
+                        SceneManager.UnloadSceneAsync(environmentName, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
+
+                        this.hasCopiedEnvironmentElements = true;
+                    }
+                    else if (shouldEnvironmentChange)
+                    {
+                        mockSceneObjects.ForEach(obj => Destroy(obj));
+                        mockSceneObjects.Clear();
+                        this.hasCopiedEnvironmentElements = false;
+
+                        yield return SharedCoroutineStarter.instance.StartCoroutine(EnvironmentPreviewRoutine(true, environmentName));
+                    }
+                }
+
+                mockSceneObjects.ForEach(obj => obj.SetActive(isEnteringPreviewState));
+                mainViewController.importantMenuObjects.ForEach(go => go.SetActive(!isEnteringPreviewState));
+                mainViewController.v3FlowCoordinator.isInSettingsView = isEnteringPreviewState;
+
+                yield return default;
+            }
+
+            public void Dispose()
+            {
+                sceneToNormalizedNames.Clear();
+                normalizedToSceneNames.Clear();
+            }
+        }
+
         [Inject] private readonly BSLParentFlowCoordinator parentFlowCoordinator;
         [Inject] private readonly PlayerDataModel dataModel;
-
         [Inject] private readonly EnvironmentSettingsV2FlowCoordinator v2FlowCoordinator;
         [Inject] private readonly EnvironmentSettingsV3FlowCoordinator v3FlowCoordinator;
-
         [Inject] private readonly SiraLog logger;
         [Inject] private readonly PluginConfig config;
 
@@ -65,33 +207,34 @@ namespace BetterStaticLights.UI.ViewControllers
         [UIValue("temp-value")]
         public string environmentLoadString
         {
-            get => sceneToNormalizedEnvironmentNames[config.nextPreviewEnvironment];
+            get
+            {
+                string value;
+                try
+                {
+                    value = transitionHelper?.GetNormalizedSceneName(config.nextPreviewEnvironment);
+                }
+                catch
+                {
+                    value = transitionHelper.normalizedToSceneNames[config.nextPreviewEnvironment];
+                }
+
+                return value;
+            }
             set => config.nextPreviewEnvironment = value;
         }
 
-        private Dictionary<string, string> sceneToNormalizedEnvironmentNames = new Dictionary<string, string>()
-        {
-            { "WeaveEnvironment", "Weave" },
-            { "PyroEnvironment", "Fall Out Boy" },
-            { "EDMEnvironment", "EDM" },
-            { "TheSecondEnvironment", "The Second" },
-            { "LizzoEnvironment", "Lizzo"},
-            { "TheWeekndEnvironment", "The Weeknd" },
-        };
-
-        private Dictionary<string, string> normalizedToSceneEnvironmentNames = new Dictionary<string, string>()
-        {
-            { "Weave", "WeaveEnvironment" },
-            { "Fall Out Boy", "PyroEnvironment" },
-            { "EDM", "EDMEnvironment" },
-            { "The Second", "TheSecondEnvironment" },
-            { "Lizzo", "LizzoEnvironment" },
-            { "The Weeknd", "TheWeekndEnvironment" },
-        };
-
-        private List<GameObject> mockSceneObjects = new List<GameObject>();
         private List<GameObject> importantMenuObjects = new List<GameObject>();
-        private bool hasCopiedEnvironmentElements = false;
+        internal MockSceneTransitionHelper transitionHelper = null;
+
+        protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
+        {
+            base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
+            if (transitionHelper != null) 
+                transitionHelper.Dispose();
+
+            transitionHelper = new MockSceneTransitionHelper(this.logger, this);
+        }
 
         public void Start()
         {
@@ -110,108 +253,23 @@ namespace BetterStaticLights.UI.ViewControllers
                     break;
 
                 case "V3":
-                    string normalizedEnvironmentValue = v3List.Value?.ToString();
-                    bool shouldEnvironmentBeChanged = !string.Equals(config.nextPreviewEnvironment, normalizedToSceneEnvironmentNames[normalizedEnvironmentValue]);
-                    environmentLoadString = normalizedToSceneEnvironmentNames[normalizedEnvironmentValue];
+                    string listValue = v3List.Value?.ToString();
+                    string serializedName = transitionHelper.GetSerializableSceneName(listValue);
+                    
+                    // If the environment hasn't changed since last time, don't load it again.
+                    bool shouldEnvironmentBeChanged = !string.Equals(config.nextPreviewEnvironment, serializedName);
+                    environmentLoadString = serializedName;
 
                     logger.Logger.Info($"Environment to load: {config.nextPreviewEnvironment} | Should Environment Change: {shouldEnvironmentBeChanged}");
 
                     parser.EmitEvent("hide-all");
-                    UnityMainThreadTaskScheduler.Factory.StartNew(() => base.StartCoroutine(this.EnvironmentPreviewRoutine(true, config.nextPreviewEnvironment, shouldEnvironmentBeChanged)));
+                    UnityMainThreadTaskScheduler.Factory.StartNew(() => base.StartCoroutine(transitionHelper?.EnvironmentPreviewRoutine(true, config.nextPreviewEnvironment, shouldEnvironmentBeChanged)));
                     parentFlowCoordinator.PresentFlowCoordinator(v3FlowCoordinator, null, AnimationDirection.Vertical);
                     break;
 
                 default:
                     break;
             }
-        }
-
-        internal IEnumerator EnvironmentPreviewRoutine(bool isEnteringPreviewState, string environmentName, bool shouldEnvironmentChange = false)
-        {
-            if (string.IsNullOrWhiteSpace(environmentName))
-            {
-                throw new ArgumentException(environmentName);
-            }
-
-            if (isEnteringPreviewState)
-            {
-                if (!this.hasCopiedEnvironmentElements)
-                {
-                    GameObject listParent = new GameObject("== BSL MOCK OBJECTS ==");
-                    GameObject environmentSceneWrapper = null!;
-                    GameObject gameCoreSceneWrapper = null!;
-
-                    int easterEggInt = 0;
-
-                    AsyncOperation envOp = SceneManager.LoadSceneAsync(environmentName, LoadSceneMode.Additive);
-                    AsyncOperation gameCoreOp = SceneManager.LoadSceneAsync("GameCore", LoadSceneMode.Additive);
-                    while (!gameCoreOp.isDone && !envOp.isDone)
-                    {
-                        if (easterEggInt == 0)
-                            logger.Logger.Debug("Hey! You found a secret debug message because I needed to add just a *little* bit more processing time before the 'WaitForFixedUpdate()' calls. Seriously! If I omit this log, the method won't work properly and the transition will break. That's why this is here, so consider this a little Easter Egg from me.");
-                        easterEggInt++;
-                        yield return new WaitForFixedUpdate();
-                    }
-
-                    environmentSceneWrapper = Resources.FindObjectsOfTypeAll<EnvironmentSceneSetup>()[0]?.transform.parent.gameObject;
-                    gameCoreSceneWrapper = Resources.FindObjectsOfTypeAll<GameCoreSceneSetup>()[0]?.transform.parent.gameObject;
-
-                    logger.Info($"EnvWrapper = {environmentSceneWrapper?.name}; GameCoreWrapper = {gameCoreSceneWrapper?.name}");
-
-                    GameObject mockSkyboxBloom = gameCoreSceneWrapper.transform.Find("BloomSkyboxQuad").gameObject;
-                    mockSkyboxBloom = Instantiate(mockSkyboxBloom.gameObject, this.transform.parent, true);
-                    mockSkyboxBloom.gameObject.name = "BSLMock - BloomSkyboxQuad";
-                    mockSkyboxBloom.transform.SetParent(listParent.transform);
-                    mockSceneObjects.Add(mockSkyboxBloom);
-
-                    switch (environmentName)
-                    {
-                        /// TODO: 
-                        /// Add environment-specific mock objects so that the previews are more accurate to the game.
-                        /// Figure out why the PlayersPlace shaders aren't working the right way
-                        /// MAYBE: Add a 1-second timeout on Confirmation to load everything and prevent exceptions.
-                        /// Clean up... but holy fuck I'm glad this works.
-                    }
-
-                    foreach (LightGroup group in environmentSceneWrapper.GetComponentsInChildren<LightGroup>())
-                    {
-                        GameObject mockGroup = Instantiate(group.gameObject, this.transform.parent, true);
-                        mockGroup.name = $"BSLMock - {group.name}";
-                        mockGroup.transform.SetParent(listParent.transform);
-
-                        mockSceneObjects.Add(mockGroup);
-                    }
-
-                    GameObject mockPlayersPlace = environmentSceneWrapper.transform.Find("PlayersPlace")?.gameObject;
-                    for (int i = 0; i < mockPlayersPlace.transform.childCount; i++)
-                    {
-                        GameObject playersPlaceObject = Instantiate(mockPlayersPlace.transform.GetChild(i).gameObject);
-                        playersPlaceObject.name = "BSLMock - " + playersPlaceObject.name.Trim('(');
-                        playersPlaceObject.transform.SetParent(listParent.transform);
-
-                        mockSceneObjects.Add(playersPlaceObject);
-                    }
-
-                    SceneManager.UnloadSceneAsync("GameCore", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
-                    SceneManager.UnloadSceneAsync(environmentName, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
-
-                    this.hasCopiedEnvironmentElements = true;
-                }
-                else if (shouldEnvironmentChange)
-                {
-                    mockSceneObjects.ForEach(obj => Destroy(obj));
-                    mockSceneObjects.Clear();
-                    this.hasCopiedEnvironmentElements = false;
-
-                    yield return StartCoroutine(EnvironmentPreviewRoutine(true, environmentName));
-                }
-            }
-
-            mockSceneObjects.ForEach(obj => obj.SetActive(isEnteringPreviewState));
-            importantMenuObjects.ForEach(go => go.SetActive(!isEnteringPreviewState));
-            v3FlowCoordinator.isInSettingsView = isEnteringPreviewState;
-
-            yield return default;
         }
     }
 }

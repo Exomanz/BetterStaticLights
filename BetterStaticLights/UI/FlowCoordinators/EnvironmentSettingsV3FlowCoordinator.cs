@@ -29,7 +29,7 @@ namespace BetterStaticLights.UI.FlowCoordinators
         protected override void BackButtonWasPressed(ViewController topViewController)
         {
             base.BackButtonWasPressed(topViewController);
-            base.StartCoroutine(mainBSLViewController.EnvironmentPreviewRoutine(false, config.nextPreviewEnvironment));
+            base.StartCoroutine(mainBSLViewController.transitionHelper?.EnvironmentPreviewRoutine(false, config.nextPreviewEnvironment));
             parentFlowCoordinator.DismissFlowCoordinator(this, null, ViewController.AnimationDirection.Vertical);
         }
     }
