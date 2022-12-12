@@ -150,6 +150,7 @@
     <Compile Include="UI\FlowCoordinators\EnvironmentSettingsV2FlowCoordinator.cs" />
     <Compile Include="UI\FlowCoordinators\EnvironmentSettingsV3FlowCoordinator.cs" />
     <Compile Include="UI\MenuButtonManager.cs" />
+    <Compile Include="UI\MockSceneTransitionHelper.cs" />
     <Compile Include="UI\ViewControllers\MainBSLViewController.cs" />
     <Compile Include="UI\ViewControllers\V2\V2LightSettingsViewController.cs" />
     <Compile Include="UI\ViewControllers\V2\V2InfoViewController.cs" />
@@ -167,6 +168,7 @@
     <EmbeddedResource Include="UI\BSML\v2info.bsml" />
     <EmbeddedResource Include="UI\BSML\v2settings.bsml" />
     <EmbeddedResource Include="UI\BSML\v3settings.bsml" />
+    <EmbeddedResource Include="UI\BSML\v3scene.bsml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BeatSaberModdingTools.Tasks">

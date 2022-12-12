@@ -33,47 +33,54 @@
 							hover-hint='Settings for the V3 Environments, including &apos;Weave&apos;, &apos;Fall Out Boy&apos;, etc.'
 							pref-width='35'
 							face-color='#44FFFF'
-							click-event='show-scene-load-modal'/>
+							on-click='conditional-modal-launch'/>
 				</horizontal>
 			</vertical>
 		</vertical>
 		
 		<modal move-to-center='True'
-			   size-delta-x='95'
-			   size-delta-y='55'
+			   size-delta-x='120'
+			   size-delta-y='65'
 			   pad='3'
 			   show-event='show-scene-load-modal'
 			   hide-event='hide-all'
 			   click-off-closes='True'>
 			<vertical>
 				<vertical vertical-fit='PreferredSize'
-						  pref-width='75'
+						  pref-width='95'
 						  bg='panel-top'
-						  pad='2'
+						  pad-top='1'
 						  child-expand-height='False'>
-					<text text='V3 Environment Previewer'
+					<text text='BETA - V3 Environment Previewer'
 						  font-size='7'
 						  italics='True'
+						  align='Top'
+						  face-color='#FF8844'/>
+				</vertical>
+				<vertical>
+					<text text='This tool lets you load a mock environment to modify your lighting experience.
+&#xA;&lt;b&gt;&lt;color=#FF5555&gt;&lt;size=125%&gt;-- LIMITATIONS --&lt;/size&gt;&lt;/color&gt;&lt;/b&gt;
+&#xA;- Every light is its default color and will not reflect your color scheme.
+&#xA;- Special environment effects are &lt;b&gt;&lt;color=#FF5555&gt;not possible&lt;/color&gt;&lt;/b&gt; in-game OR in-preview.
+&#xA;- Minimized environment : only relevant objects are loaded.
+&#xA;This is still a Proof-of-Concept, so things might break or work in unexpected ways.'
 						  align='Top'/>
 				</vertical>
-				<text text='Select an Environment to Preview'
-					  align='Top'
-					  font-size='5'/>
-				<horizontal>
-					<button text='Back'
+
+				<horizontal vertical-fit='MinSize'
+							horizontal-fit='MinSize'
+							spacing='25'
+							pad-bottom='3'>
+					<button text='Cancel'
 							face-color='#FF4444'
-							click-event='hide-all'/>
+							click-event='hide-all'
+							pref-width='25'/>
 					<button text='Confirm'
-							face-color='#44FF44'
-							on-click='v3-button-click'/>
+							face-color='#55FF55'
+							on-click='v3-button-click'
+							pref-width='25'/>
 				</horizontal>
 			</vertical>
-
-			<list-setting id='v3-list'
-						  text=''
-						  choices='v3-environment-list'
-						  value='temp-value'
-						  ignore-layout='True'/>
 		</modal>
 	</vertical>
 </bg>
