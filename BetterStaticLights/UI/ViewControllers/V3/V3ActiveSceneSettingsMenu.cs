@@ -34,7 +34,7 @@ namespace BetterStaticLights.UI.ViewControllers.V3
 
         private IEnumerator iHateCoroutines()
         {
-            yield return base.StartCoroutine(transitionHelper?.EnvironmentPreviewRoutine(true, config.nextPreviewEnvironment));
+            yield return base.StartCoroutine(transitionHelper?.EnvironmentPreviewRoutine(true, config.environmentPreview));
             isCoroutineDone = true;
         }
     }

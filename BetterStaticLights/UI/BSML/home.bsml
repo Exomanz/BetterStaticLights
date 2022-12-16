@@ -62,7 +62,7 @@
 &#xA;&lt;b&gt;&lt;color=#FF5555&gt;&lt;size=125%&gt;-- LIMITATIONS --&lt;/size&gt;&lt;/color&gt;&lt;/b&gt;
 &#xA;- Every light is its default color and will not reflect your color scheme.
 &#xA;- Special environment effects are &lt;b&gt;&lt;color=#FF5555&gt;not possible&lt;/color&gt;&lt;/b&gt; in-game OR in-preview.
-&#xA;- Minimized environment : only relevant objects are loaded.
+&#xA;- Minimized environment - Only relevant objects are loaded.
 &#xA;This is still a Proof-of-Concept, so things might break or work in unexpected ways.'
 						  align='Top'/>
 				</vertical>

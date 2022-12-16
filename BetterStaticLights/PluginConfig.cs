@@ -22,7 +22,7 @@ namespace BetterStaticLights
         #endregion
 
         #region V3
-        public virtual string nextPreviewEnvironment { get; set; } = "WeaveEnvironment";
+        public virtual string environmentPreview { get; set; } = "WeaveEnvironment";
         public bool firstTimePreviewing { get; set; } = true;
         #endregion
     }

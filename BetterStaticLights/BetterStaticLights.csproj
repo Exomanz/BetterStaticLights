@@ -139,6 +139,7 @@
     <Compile Include="DEBUG.cs" />
     <Compile Include="Configuration\EnvironmentLightMappings.cs" />
     <Compile Include="Configuration\LightSetV2.cs" />
+    <Compile Include="Installers\BSLGameInstaller.cs" />
     <Compile Include="Installers\BSLMenuInstaller.cs" />
     <Compile Include="Patches\V2EnvironmentLightPatcher.cs" />
     <Compile Include="Patches\V3EnvironmentLightOverrides.cs" />

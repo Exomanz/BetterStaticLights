@@ -10,8 +10,9 @@ using BetterStaticLights.UI.FlowCoordinators;
 
 namespace BetterStaticLights.UI
 {
-    internal class MockSceneTransitionHelper : IDisposable
+    internal class MockSceneTransitionHelper : IInitializable, IDisposable
     {
+
         internal static Dictionary<string, string> sceneToNormalizedNames = new Dictionary<string, string>()
         {
             { "WeaveEnvironment", "Weave" },
@@ -20,6 +21,7 @@ namespace BetterStaticLights.UI
             { "TheSecondEnvironment", "The Second" },
             { "LizzoEnvironment", "Lizzo"},
             { "TheWeekndEnvironment", "The Weeknd" },
+            { "RockMixtapeEnvironment", "Rock Mixtape" }
         };
 
         internal static Dictionary<string, string> normalizedToSceneNames = new Dictionary<string, string>()
@@ -30,16 +32,23 @@ namespace BetterStaticLights.UI
             { "The Second", "TheSecondEnvironment" },
             { "Lizzo", "LizzoEnvironment" },
             { "The Weeknd", "TheWeekndEnvironment" },
+            { "Rock Mixtape", "RockMixtapeEnvironment" }
         };
 
         [Inject] private readonly SiraLog logger;
         [Inject] private readonly MainBSLViewController mainViewController;
         [Inject] private readonly EnvironmentSettingsV3FlowCoordinator v3FlowCoordinator;
         [Inject] private readonly PluginConfig config;
+        [Inject] private readonly StandardLevelDetailViewController levelView;
 
         private List<GameObject> mockSceneObjects = new List<GameObject>();
         private bool hasCopiedEnvironmentElements = false;
+        private string previouslyLoadedEnvironment = null;
 
+        public void Initialize()
+        {
+            levelView.didPressActionButtonEvent += this.Clean;
+        }
 
         public static string GetNormalizedSceneName(string sceneName)
         {
@@ -53,13 +62,20 @@ namespace BetterStaticLights.UI
             return value;
         }
 
-        public IEnumerator EnvironmentPreviewRoutine(bool isEnteringPreviewState, string environmentName = "WeaveEnvironment", bool shouldEnvironmentChange = false)
+        /// <summary>
+        /// Weirdchamp basegame implementation of Actions
+        /// </summary>
+        /// <param name="sldvc"></param>
+        public void Clean(StandardLevelDetailViewController sldvc)
         {
-            logger.Logger.Info($"{isEnteringPreviewState}, {environmentName}, {shouldEnvironmentChange}");
+            SharedCoroutineStarter.instance.StartCoroutine(this.EnvironmentPreviewRoutine(false, destroyCachedEnvironmentObjects: true));
+        }
 
+        public IEnumerator EnvironmentPreviewRoutine(bool isEnteringPreviewState, string environmentName = "WeaveEnvironment", bool destroyCachedEnvironmentObjects = false)
+        {
             if (string.IsNullOrWhiteSpace(environmentName))
             {
-                config.nextPreviewEnvironment = "WeaveEnvironment";
+                config.environmentPreview = "WeaveEnvironment";
                 throw new ArgumentException($"Illegal argument given for {environmentName}. Defaulting to 'WeaveEnvironment'", environmentName);
             }
 
@@ -122,14 +138,23 @@ namespace BetterStaticLights.UI
 
                     this.hasCopiedEnvironmentElements = true;
                 }
-                else if (shouldEnvironmentChange)
+                else if (!string.Equals(config.environmentPreview, previouslyLoadedEnvironment))
                 {
+                    previouslyLoadedEnvironment = config.environmentPreview;
                     mockSceneObjects.ForEach(obj => GameObject.Destroy(obj));
                     mockSceneObjects.Clear();
                     this.hasCopiedEnvironmentElements = false;
 
                     yield return SharedCoroutineStarter.instance.StartCoroutine(EnvironmentPreviewRoutine(true, environmentName));
                 }
+            }
+
+            else if (destroyCachedEnvironmentObjects)
+            {
+                mockSceneObjects.ForEach(obj => GameObject.Destroy(obj));
+                mockSceneObjects.Clear();
+                this.hasCopiedEnvironmentElements = false;
+                yield return default;
             }
 
             mockSceneObjects.ForEach(obj => obj.SetActive(isEnteringPreviewState));

@@ -2,12 +2,15 @@
 using BetterStaticLights.Configuration;
 using BetterStaticLights.Installers;
 using BetterStaticLights.Patches;
+using BetterStaticLights.UI;
 using HarmonyLib;
 using IPA;
 using IPA.Config.Stores;
 using SiraUtil.Logging;
 using SiraUtil.Zenject;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using IPAConfig = IPA.Config.Config;
@@ -19,6 +22,7 @@ namespace BetterStaticLights
     public class Plugin
     {
         public static Plugin Instance { get; private set; }
+        internal bool DEBUG { get; private set; } = false;
 
         internal readonly PluginConfig Config;
         internal readonly Harmony harmony = new Harmony("com.beatsaber.exo.betterstaticlights");
@@ -27,6 +31,9 @@ namespace BetterStaticLights
         [Init]
         public Plugin(IPAConfig config, IPALogger logger, Zenjector zenjector)
         {
+            if (Environment.GetCommandLineArgs().Any(arg => arg.Equals("--bsl-debug")))
+                this.DEBUG = true;
+
             Instance = this;
             Config = config.Generated<PluginConfig>();
             Logger = logger;
@@ -37,31 +44,18 @@ namespace BetterStaticLights
                 Container.Bind<PluginConfig>().FromInstance(this.Config).AsCached();
             });
             zenjector.Install<BSLMenuInstaller>(Location.Menu);
-            zenjector.Install<EnvironmentSceneSetup>((Container) =>
-            {
-                var environmentInfo = Container.TryResolve<EnvironmentSceneSetupData>();
-                if (environmentInfo != null)
-                {
-                    EnvironmentInfoSO info = environmentInfo.environmentInfo;
-#if DEBUG
-                    foreach (Scene scene in SceneManager.GetAllScenes())
-                    {
-                        logger.Info(scene.name);
-                    }
-#endif
-                    logger.Info(info.sceneInfo.sceneName);
-                    Container.Bind<V3EnvironmentLightOverrides>().FromNewComponentOn(new GameObject("LightOverrides")).AsSingle().WithArguments(info).NonLazy();
-                }
-            });
+            zenjector.Install<BSLGameInstaller>(Location.StandardPlayer);
         }
 
         [OnEnable]
         public void Enable()
         {
-#if DEBUG
-            GAMEOBJECTNAMEGETTER DEBUG = new GameObject("NAMEGETTER").AddComponent<GAMEOBJECTNAMEGETTER>();
-            Object.DontDestroyOnLoad(DEBUG);
-#endif
+            if (this.DEBUG)
+            {
+                GAMEOBJECTNAMEGETTER NAMEGETTER = new GameObject("BSLNAMEGETTER").AddComponent<GAMEOBJECTNAMEGETTER>();
+                UnityEngine.Object.DontDestroyOnLoad(NAMEGETTER);
+            }
+
             this.PopulateV2LightSetList();
             harmony.PatchAll(System.Reflection.Assembly.GetExecutingAssembly());
         }

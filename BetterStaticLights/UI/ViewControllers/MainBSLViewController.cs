@@ -64,8 +64,8 @@ namespace BetterStaticLights.UI.ViewControllers
         [UIValue("temp-value")]
         public string environmentLoadString
         {
-            get => MockSceneTransitionHelper.GetNormalizedSceneName(config.nextPreviewEnvironment);
-            set => config.nextPreviewEnvironment = value;
+            get => MockSceneTransitionHelper.GetNormalizedSceneName(config.environmentPreview);
+            set => config.environmentPreview = value;
         }
 
         public List<GameObject> importantMenuObjects = new List<GameObject>();
