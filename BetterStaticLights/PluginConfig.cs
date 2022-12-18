@@ -1,6 +1,7 @@
 ﻿using BetterStaticLights.Configuration;
 using IPA.Config.Stores;
 using IPA.Config.Stores.Attributes;
+using IPA.Config.Stores.Converters;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine.UIElements;
@@ -23,7 +24,33 @@ namespace BetterStaticLights
 
         #region V3
         public virtual string environmentPreview { get; set; } = "WeaveEnvironment";
-        public bool firstTimePreviewing { get; set; } = true;
+        public virtual bool firstTimePreviewing { get; set; } = true;
+
+        [UseConverter(typeof(ListConverter<EnvironmentConfigurationData>))]
+        public virtual List<EnvironmentConfigurationData> environmentConfigurations { get; set; } = new List<EnvironmentConfigurationData>
+        {
+            new EnvironmentConfigurationData(0, "WeaveEnvironment", 16),
+            new EnvironmentConfigurationData(1, "PyroEnvironment", 14),
+            new EnvironmentConfigurationData(2, "EDMEnvironment", 18),
+            new EnvironmentConfigurationData(3, "TheSecondEnvironment", 14),
+            new EnvironmentConfigurationData(4, "LizzoEnvironment", 20),
+            new EnvironmentConfigurationData(5, "TheWeekndEnvironment", 35),
+            new EnvironmentConfigurationData(6, "RockMixtapeEnvironment", 38)
+        };
+/*
+        public virtual EnvironmentConfigurationData WeaveEnvironmentConfigurationData { get; set; } = new EnvironmentConfigurationData("WeaveEnvironment", 16);
+
+        public virtual EnvironmentConfigurationData PyroEnvironmentConfigurationData { get; set; } = new EnvironmentConfigurationData("PyroEnvironment", 14);
+
+        public virtual EnvironmentConfigurationData EDMEnvironmentConfigurationData { get; set; } = new EnvironmentConfigurationData("EDMEnvironment", 18);
+
+        public virtual EnvironmentConfigurationData TheSecondEnvironmentConfigurationData { get; set; } = new EnvironmentConfigurationData("TheSecondEnvironment", 14);
+
+        public virtual EnvironmentConfigurationData LizzoEnvironmentConfigurationData { get; set; } = new EnvironmentConfigurationData("LizzoEnvironment", 20);
+
+        public virtual EnvironmentConfigurationData TheWeekndEnvironmentConfigurationData { get; set; } = new EnvironmentConfigurationData("TheWeekndEnvironment", 35);
+
+        public virtual EnvironmentConfigurationData RockMixtapeEnvironmentConfigurationData { get; set; } = new EnvironmentConfigurationData("RockMixtapeEnvironment", 38);*/
         #endregion
     }
 }

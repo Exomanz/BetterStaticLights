@@ -47,7 +47,7 @@ namespace BetterStaticLights.UI
 
         public void Initialize()
         {
-            levelView.didPressActionButtonEvent += this.Clean;
+            levelView.didPressActionButtonEvent += this.Cleanup;
         }
 
         public static string GetNormalizedSceneName(string sceneName)
@@ -62,11 +62,7 @@ namespace BetterStaticLights.UI
             return value;
         }
 
-        /// <summary>
-        /// Weirdchamp basegame implementation of Actions
-        /// </summary>
-        /// <param name="sldvc"></param>
-        public void Clean(StandardLevelDetailViewController sldvc)
+        public void Cleanup(StandardLevelDetailViewController sldvc)
         {
             SharedCoroutineStarter.instance.StartCoroutine(this.EnvironmentPreviewRoutine(false, destroyCachedEnvironmentObjects: true));
         }
@@ -110,8 +106,6 @@ namespace BetterStaticLights.UI
                         /// TODO: 
                         /// Add environment-specific mock objects so that the previews are more accurate to the game.
                         /// Figure out why the PlayersPlace shaders aren't working the right way
-                        /// Add a 1-second timeout on Confirmation to load everything and prevent exceptions (this happens a lot more than it should).
-                        /// Clean up... but holy fuck I'm glad this works.
                     }
 
                     foreach (LightGroup group in environmentSceneWrapper.GetComponentsInChildren<LightGroup>())

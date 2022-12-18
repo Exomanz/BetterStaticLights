@@ -16,7 +16,6 @@ namespace BetterStaticLights.Installers
             Container.Bind<BSLParentFlowCoordinator>().FromNewComponentOn(new GameObject("BSL - Parent FlowCoordinator")).AsSingle();
             Container.Bind<EnvironmentSettingsV2FlowCoordinator>().FromNewComponentOn(new GameObject("BSL - V2 Settings FlowCoordinator")).AsSingle();
             Container.Bind<EnvironmentSettingsV3FlowCoordinator>().FromNewComponentOn(new GameObject("BSL - V3 Settings FlowCoordinator")).AsSingle();
-            Container.BindInterfacesAndSelfTo<MockSceneTransitionHelper>().AsSingle();
 
             // Settings Host
             BindViewController<MainBSLViewController>();
@@ -26,6 +25,7 @@ namespace BetterStaticLights.Installers
             BindViewController<V2InfoViewController>();
 
             // V3
+            Container.BindInterfacesAndSelfTo<MockSceneTransitionHelper>().AsSingle();
             BindViewController<V3LightSettingsViewController>();
             BindViewController<V3ActiveSceneSettingsMenu>();
 
