@@ -37,20 +37,6 @@ namespace BetterStaticLights
             new EnvironmentConfigurationData(5, "TheWeekndEnvironment", 35),
             new EnvironmentConfigurationData(6, "RockMixtapeEnvironment", 38)
         };
-/*
-        public virtual EnvironmentConfigurationData WeaveEnvironmentConfigurationData { get; set; } = new EnvironmentConfigurationData("WeaveEnvironment", 16);
-
-        public virtual EnvironmentConfigurationData PyroEnvironmentConfigurationData { get; set; } = new EnvironmentConfigurationData("PyroEnvironment", 14);
-
-        public virtual EnvironmentConfigurationData EDMEnvironmentConfigurationData { get; set; } = new EnvironmentConfigurationData("EDMEnvironment", 18);
-
-        public virtual EnvironmentConfigurationData TheSecondEnvironmentConfigurationData { get; set; } = new EnvironmentConfigurationData("TheSecondEnvironment", 14);
-
-        public virtual EnvironmentConfigurationData LizzoEnvironmentConfigurationData { get; set; } = new EnvironmentConfigurationData("LizzoEnvironment", 20);
-
-        public virtual EnvironmentConfigurationData TheWeekndEnvironmentConfigurationData { get; set; } = new EnvironmentConfigurationData("TheWeekndEnvironment", 35);
-
-        public virtual EnvironmentConfigurationData RockMixtapeEnvironmentConfigurationData { get; set; } = new EnvironmentConfigurationData("RockMixtapeEnvironment", 38);*/
         #endregion
     }
 }

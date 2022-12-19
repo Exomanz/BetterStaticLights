@@ -17,6 +17,9 @@ namespace BetterStaticLights.Configuration
         [UseConverter(typeof(ListConverter<LightSetV3>))]
         public List<LightSetV3> activeGroupConfigurationData { get; internal set; } = new List<LightSetV3>();
 
+        [UseConverter(typeof(ListConverter<int>))]
+        public List<int> activeLightGroups { get; internal set; } = new List<int>();
+
         public EnvironmentConfigurationData() { }
 
         /// <summary>
@@ -29,11 +32,6 @@ namespace BetterStaticLights.Configuration
             this.id = id;
             this.environmentName = environmentName;
             this.numberOfGroups = numberOfGroups;
-
-            for (int i = 0; i < numberOfGroups; i++)
-            {
-                this.activeGroupConfigurationData.Add(new LightSetV3(i, true));
-            }
         }
     }
 }

@@ -13,7 +13,7 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         [Inject] private readonly MockSceneTransitionHelper transitionHelper;
         [Inject] private readonly PluginConfig config;
 
-        private bool _coroutineDone = false;
+        public bool _coroutineDone = false;
 
         [UIValue("is-coroutine-done")]
         public bool isCoroutineDone
@@ -34,8 +34,7 @@ namespace BetterStaticLights.UI.ViewControllers.V3
 
         private IEnumerator iHateCoroutines()
         {
-            yield return base.StartCoroutine(transitionHelper?.EnvironmentPreviewRoutine(true, config.environmentPreview));
-            isCoroutineDone = true;
+            yield return base.StartCoroutine(transitionHelper.EnvironmentPreviewRoutine(true, config.environmentPreview));
         }
     }
 }

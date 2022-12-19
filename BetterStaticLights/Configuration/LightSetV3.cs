@@ -5,8 +5,8 @@
     /// </summary>
     internal class LightSetV3
     {
-        public bool enabled { get; internal set; } = false;
         public int groupID { get; internal set; } = 0;
+        public bool enabled { get; internal set; } = false;
         public int rotX { get; internal set; } = 0;
         public int rotY { get; internal set; } = 0;
         public float brightness { get; internal set; } = 1f;
