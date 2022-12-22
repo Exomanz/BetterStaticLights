@@ -55,9 +55,11 @@ namespace BetterStaticLights.UI
         [Inject] private readonly PluginConfig config;
         [Inject] private readonly StandardLevelDetailViewController levelView;
 
+        public string previouslyLoadedEnvironment = null;
+
+        private Scene mockScene;
         private List<GameObject> mockSceneObjects = new List<GameObject>();
         private bool hasCopiedEnvironmentElements = false;
-        private string previouslyLoadedEnvironment = null;
 
         public void Initialize()
         {
@@ -93,89 +95,73 @@ namespace BetterStaticLights.UI
             {
                 if (!hasCopiedEnvironmentElements)
                 {
-                    GameObject listParent;
-                    if (GameObject.Find("== BSL MOCK OBJECTS ==") == null)
-                        listParent = new GameObject("== BSL MOCK OBJECTS ==");
-                    else listParent = GameObject.Find("== BSL MOCK OBJECTS ==");
+                    GameObject listParent = new GameObject("== BSL MOCK OBJECTS ==");
+                    mockSceneObjects.Add(listParent);
 
-                    GameObject environmentSceneWrapper = null!;
-                    GameObject gameCoreSceneWrapper = null!;
+                    GameObject env = null!;
+                    GameObject core = null!;
 
-                    AsyncOperation envOp = SceneManager.LoadSceneAsync(environmentName, LoadSceneMode.Additive);
-                    AsyncOperation gameCoreOp = SceneManager.LoadSceneAsync("GameCore", LoadSceneMode.Additive);
+                    SceneManager.LoadSceneAsync(environmentName, LoadSceneMode.Additive);
+                    SceneManager.LoadSceneAsync("GameCore", LoadSceneMode.Additive);
 
                     yield return new WaitForSecondsRealtime(1f);
 
+                    mockScene = SceneManager.GetSceneByName(environmentName);
+
                     yield return UnityMainThreadTaskScheduler.Factory.StartNew(() =>
                     {
-                        environmentSceneWrapper = Resources.FindObjectsOfTypeAll<EnvironmentSceneSetup>()[0]?.transform.parent.gameObject;
-                        gameCoreSceneWrapper = Resources.FindObjectsOfTypeAll<GameCoreSceneSetup>()[0]?.transform.parent.gameObject;
+                        void AddNewMock(GameObject obj)
+                        {
+                            if (obj == null) return;
 
-                        GameObject mockSkyboxBloom = gameCoreSceneWrapper.transform.Find("BloomSkyboxQuad").gameObject;
-                        mockSkyboxBloom = GameObject.Instantiate(mockSkyboxBloom.gameObject, mainViewController.transform.parent, true);
-                        mockSkyboxBloom.gameObject.name = "BSLMock - BloomSkyboxQuad";
-                        mockSkyboxBloom.transform.SetParent(listParent.transform);
-                        mockSceneObjects.Add(mockSkyboxBloom);
+                            obj = GameObject.Instantiate(obj, mainViewController.transform.parent, true);
+                            obj.name = "BSLMock - " + obj.name;
+                            obj.name.TrimStart('(');
+                            obj.transform.SetParent(listParent.transform);
+                            mockSceneObjects.Add(obj);
+                        }
 
-                        GameObject.Destroy(environmentSceneWrapper.GetComponentInChildren<SaberBurnMarkArea>());
-                        GameObject.Destroy(environmentSceneWrapper.GetComponentInChildren<SaberBurnMarkSparkles>());
+                        env = Resources.FindObjectsOfTypeAll<EnvironmentSceneSetup>()[0]?.transform.parent.gameObject;
+                        env.transform.SetParent(listParent.transform);
+
+                        core = Resources.FindObjectsOfTypeAll<GameCoreSceneSetup>()[0]?.transform.parent.gameObject;
+                        AddNewMock(core.transform.Find("BloomSkyboxQuad").gameObject);
+
+                        GameObject.Destroy(env.GetComponentInChildren<CoreGameHUDController>().gameObject);
+                        GameObject.Destroy(env.GetComponentInChildren<MoveAndRotateWithMainCamera>().gameObject);
 
                         switch (environmentName)
                         {
                             case "PyroEnvironment":
-                                environmentSceneWrapper.GetComponentsInChildren<FireEffect>().ToList().ForEach(obj =>
-                                    GameObject.Destroy(obj));
+                                env.GetComponentsInChildren<FireEffect>().ToList().ForEach(obj => GameObject.Destroy(obj.gameObject));
 
                                 break;
                             case "TheSecondEnvironment":
-                                GameObject.Destroy(environmentSceneWrapper.GetComponentInChildren<SmoothStepPositionGroupEventEffect>());
+                                GameObject.Destroy(env.GetComponentInChildren<SmoothStepPositionGroupEventEffect>());
 
                                 break;
                             case "LizzoEnvironment":
-                                environmentSceneWrapper.GetComponentsInChildren<WhiteColorOrAlphaGroupEffectManager>().ToList().ForEach(obj =>
-                                    GameObject.Destroy(obj));
+                                env.GetComponentsInChildren<WhiteColorOrAlphaGroupEffectManager>().ToList().ForEach(obj => GameObject.Destroy(obj.gameObject));
 
                                 break;
-
-                            /// TODO: 
-                            /// Add environment-specific mock objects so that the previews are more accurate to the game.
-                            /// Figure out why the PlayersPlace shaders aren't working the right way
-                        }
-
-                        foreach (LightGroup group in environmentSceneWrapper.GetComponentsInChildren<LightGroup>())
-                        {
-                            GameObject mockGroup = GameObject.Instantiate(group.gameObject, mainViewController.transform.parent, true);
-                            mockGroup.name = $"BSLMock - {group.name}";
-                            mockGroup.transform.SetParent(listParent.transform);
-
-                            mockSceneObjects.Add(mockGroup);
-                        }
-
-                        GameObject mockPlayersPlace = environmentSceneWrapper.transform.Find("PlayersPlace")?.gameObject;
-                        for (int i = 0; i < mockPlayersPlace.transform.childCount; i++)
-                        {
-                            GameObject playersPlaceObject = GameObject.Instantiate(mockPlayersPlace.transform.GetChild(i).gameObject);
-                            playersPlaceObject.name = "BSLMock - " + playersPlaceObject.name.Trim('(');
-                            playersPlaceObject.transform.SetParent(listParent.transform);
-
-                            mockSceneObjects.Add(playersPlaceObject);
                         }
                     });
 
                     SceneManager.UnloadSceneAsync("GameCore", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
-                    SceneManager.UnloadSceneAsync(environmentName, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
 
+                    mockSceneObjects.Add(env);
                     previouslyLoadedEnvironment = environmentName;
                     hasCopiedEnvironmentElements = true;
                 }
 
                 else if (!string.Equals(config.environmentPreview, previouslyLoadedEnvironment))
                 {
-                    previouslyLoadedEnvironment = config.environmentPreview;
                     mockSceneObjects.ForEach(obj => GameObject.Destroy(obj));
                     mockSceneObjects.Clear();
+                    SceneManager.UnloadSceneAsync(mockScene, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
 
                     hasCopiedEnvironmentElements = false;
+                    previouslyLoadedEnvironment = config.environmentPreview;
 
                     yield return SharedCoroutineStarter.instance.StartCoroutine(this.SetOrChangeEnvironmentPreview(true, environmentName));
                 }
@@ -187,14 +173,17 @@ namespace BetterStaticLights.UI
                 mockSceneObjects.Clear();
                 hasCopiedEnvironmentElements = false;
 
-                yield return default;
+                if (mockScene.name != null)
+                    SceneManager.UnloadSceneAsync(mockScene, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
+
+                yield break;
             }
 
             mockSceneObjects.ForEach(obj => obj.SetActive(isEnteringPreviewState));
             mainViewController.importantMenuObjects.ForEach(go => go.SetActive(!isEnteringPreviewState));
             v3FlowCoordinator.isInSettingsView = isEnteringPreviewState;
 
-            yield return default;
+            yield break;
         }
 
         public void Dispose()

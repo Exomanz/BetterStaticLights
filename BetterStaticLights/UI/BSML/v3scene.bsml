@@ -23,10 +23,11 @@
 					  text='Environment'
 					  choices='v3-environment-list'
 					  value='env-setting'
-					  get-event='refresh-env-setting'/>
-		<button text='Apply'
+					  on-change='handle-list-did-change'/>
+		<button id='apply-button'
+				text='Apply'
 				face-color='#55FF55'
-				interactable='True'
+				interactable='False'
 				pref-width='25'
 				on-click='save-and-apply-env-setting'/>
 	</vertical>

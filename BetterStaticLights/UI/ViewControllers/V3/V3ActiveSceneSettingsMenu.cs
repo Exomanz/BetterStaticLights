@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Zenject;
 using BeatSaberMarkupLanguage.Components.Settings;
 using SiraUtil.Logging;
+using UnityEngine.UI;
 
 namespace BetterStaticLights.UI.ViewControllers.V3
 {
@@ -28,6 +29,9 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         [UIComponent("environment-list-setting")]
         public ListSetting envListSetting;
 
+        [UIComponent("apply-button")]
+        public Button applyButton;
+
         [UIValue("v3-environment-list")]
         public List<object> v3Environments => MockSceneTransitionHelper.v3Environments;
 
@@ -38,12 +42,12 @@ namespace BetterStaticLights.UI.ViewControllers.V3
             set => config.environmentPreview = value;
         }
 
-        [UIAction("#post-parse")]
-        private void __Post()
+        [UIAction("handle-list-did-change")]
+        private void ListDidChangeEvent(string value)
         {
-            if (envListSetting != null)
+            if (!string.Equals(transitionHelper.previouslyLoadedEnvironment, MockSceneTransitionHelper.GetSerializableSceneName(value)))
             {
-                parser.EmitEvent("refresh-env-setting");
+                applyButton.interactable = true;
             }
         }
 
@@ -51,9 +55,9 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         private void Apply()
         {
             environmentSetting = MockSceneTransitionHelper.GetSerializableSceneName(envListSetting.Value.ToString());
-
             loadParent.SetActive(true);
             settingsParent.SetActive(false);
+            applyButton.interactable = false;
             base.StartCoroutine(this.ToggleActiveSettingsViewOrRefresh());
         }
 
