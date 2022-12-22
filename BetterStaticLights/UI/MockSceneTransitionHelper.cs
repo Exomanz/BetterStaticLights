@@ -15,6 +15,16 @@ namespace BetterStaticLights.UI
 {
     internal class MockSceneTransitionHelper : IInitializable, IDisposable
     {
+        public static List<object> v3Environments { get; } = new List<object>()
+        {
+            "Weave",
+            "Fall Out Boy",
+            "EDM",
+            "The Second",
+            "Lizzo",
+            "The Weeknd",
+            "Rock Mixtape"
+        };
 
         internal static Dictionary<string, string> sceneToNormalizedNames = new Dictionary<string, string>()
         {
@@ -68,15 +78,15 @@ namespace BetterStaticLights.UI
 
         public void Cleanup(StandardLevelDetailViewController sldvc)
         {
-            SharedCoroutineStarter.instance.StartCoroutine(this.EnvironmentPreviewRoutine(false, destroyCachedEnvironmentObjects: true));
+            SharedCoroutineStarter.instance.StartCoroutine(this.SetOrChangeEnvironmentPreview(false, destroyCachedEnvironmentObjects: true));
         }
 
-        public IEnumerator EnvironmentPreviewRoutine(bool isEnteringPreviewState, string environmentName = "WeaveEnvironment", bool destroyCachedEnvironmentObjects = false)
+        public IEnumerator SetOrChangeEnvironmentPreview(bool isEnteringPreviewState, string environmentName = "WeaveEnvironment", bool destroyCachedEnvironmentObjects = false)
         {
             if (string.IsNullOrWhiteSpace(environmentName))
             {
                 config.environmentPreview = "WeaveEnvironment";
-                throw new ArgumentException($"Illegal argument given for {environmentName}. Defaulting to 'WeaveEnvironment'", environmentName);
+                throw new ArgumentException($"Illegal argument given for string argument 'environmentName'. Defaulting to 'WeaveEnvironment'", environmentName);
             }
 
             if (isEnteringPreviewState)
@@ -87,13 +97,13 @@ namespace BetterStaticLights.UI
                     if (GameObject.Find("== BSL MOCK OBJECTS ==") == null)
                         listParent = new GameObject("== BSL MOCK OBJECTS ==");
                     else listParent = GameObject.Find("== BSL MOCK OBJECTS ==");
+
                     GameObject environmentSceneWrapper = null!;
                     GameObject gameCoreSceneWrapper = null!;
 
                     AsyncOperation envOp = SceneManager.LoadSceneAsync(environmentName, LoadSceneMode.Additive);
                     AsyncOperation gameCoreOp = SceneManager.LoadSceneAsync("GameCore", LoadSceneMode.Additive);
 
-                    // Give the operations some time to complete.
                     yield return new WaitForSecondsRealtime(1f);
 
                     yield return UnityMainThreadTaskScheduler.Factory.StartNew(() =>
@@ -107,12 +117,26 @@ namespace BetterStaticLights.UI
                         mockSkyboxBloom.transform.SetParent(listParent.transform);
                         mockSceneObjects.Add(mockSkyboxBloom);
 
-                        // Minimizations BEFORE Copying
                         GameObject.Destroy(environmentSceneWrapper.GetComponentInChildren<SaberBurnMarkArea>());
                         GameObject.Destroy(environmentSceneWrapper.GetComponentInChildren<SaberBurnMarkSparkles>());
 
                         switch (environmentName)
                         {
+                            case "PyroEnvironment":
+                                environmentSceneWrapper.GetComponentsInChildren<FireEffect>().ToList().ForEach(obj =>
+                                    GameObject.Destroy(obj));
+
+                                break;
+                            case "TheSecondEnvironment":
+                                GameObject.Destroy(environmentSceneWrapper.GetComponentInChildren<SmoothStepPositionGroupEventEffect>());
+
+                                break;
+                            case "LizzoEnvironment":
+                                environmentSceneWrapper.GetComponentsInChildren<WhiteColorOrAlphaGroupEffectManager>().ToList().ForEach(obj =>
+                                    GameObject.Destroy(obj));
+
+                                break;
+
                             /// TODO: 
                             /// Add environment-specific mock objects so that the previews are more accurate to the game.
                             /// Figure out why the PlayersPlace shaders aren't working the right way
@@ -141,18 +165,19 @@ namespace BetterStaticLights.UI
                     SceneManager.UnloadSceneAsync("GameCore", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
                     SceneManager.UnloadSceneAsync(environmentName, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
 
-                    this.hasCopiedEnvironmentElements = true;
-                    v3SceneSettings.isCoroutineDone = true;
+                    previouslyLoadedEnvironment = environmentName;
+                    hasCopiedEnvironmentElements = true;
                 }
+
                 else if (!string.Equals(config.environmentPreview, previouslyLoadedEnvironment))
                 {
                     previouslyLoadedEnvironment = config.environmentPreview;
                     mockSceneObjects.ForEach(obj => GameObject.Destroy(obj));
                     mockSceneObjects.Clear();
-                    this.hasCopiedEnvironmentElements = false;
-                    v3SceneSettings.isCoroutineDone = false;
 
-                    yield return SharedCoroutineStarter.instance.StartCoroutine(EnvironmentPreviewRoutine(true, environmentName));
+                    hasCopiedEnvironmentElements = false;
+
+                    yield return SharedCoroutineStarter.instance.StartCoroutine(this.SetOrChangeEnvironmentPreview(true, environmentName));
                 }
             }
 
@@ -160,8 +185,7 @@ namespace BetterStaticLights.UI
             {
                 mockSceneObjects.ForEach(obj => GameObject.Destroy(obj));
                 mockSceneObjects.Clear();
-                this.hasCopiedEnvironmentElements = false;
-                v3SceneSettings.isCoroutineDone = false;
+                hasCopiedEnvironmentElements = false;
 
                 yield return default;
             }

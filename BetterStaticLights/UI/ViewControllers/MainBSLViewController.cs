@@ -4,18 +4,10 @@ using BeatSaberMarkupLanguage.Components.Settings;
 using BeatSaberMarkupLanguage.Parser;
 using BeatSaberMarkupLanguage.ViewControllers;
 using BetterStaticLights.UI.FlowCoordinators;
-using IPA.Utilities.Async;
 using SiraUtil.Logging;
-using System;
-using System.CodeDom.Compiler;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Zenject;
 
@@ -51,15 +43,7 @@ namespace BetterStaticLights.UI.ViewControllers
         public void V3ButtonPress() => _OnButtonPress("V3");
 
         [UIValue("v3-environment-list")]
-        public List<object> v3Environments { get; } = new List<object>()
-        {
-            "Weave",
-            "Fall Out Boy",
-            "EDM",
-            "The Second",
-            "Lizzo",
-            "The Weeknd",
-        };
+        public List<object> v3Environments => MockSceneTransitionHelper.v3Environments;
 
         [UIValue("temp-value")]
         public string environmentLoadString

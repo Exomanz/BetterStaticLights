@@ -2,10 +2,32 @@
 	xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ 
 	https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
 	
-	<vertical active='~is-coroutine-done' vertical-fit='PreferredSize' spacing='3'>
+	<vertical id='loading-parent'
+			  vertical-fit='PreferredSize' 
+			  spacing='3'>
 		<loading preserve-aspect='True'/>
 		<text text='Loading Previewer...'
 			  italics='True'
 			  font-size='5'/>
+	</vertical>
+	<vertical id='settings-parent'
+			  active='False'
+			  bg='panel-top'
+			  bg-color='#000000DD'
+			  vertical-fit='PreferredSize'
+			  pref-width='90'
+			  pad='2'
+			  spacing='2'
+			  anchor-pos-y='-17'>
+		<list-setting id='environment-list-setting' 
+					  text='Environment'
+					  choices='v3-environment-list'
+					  value='env-setting'
+					  get-event='refresh-env-setting'/>
+		<button text='Apply'
+				face-color='#55FF55'
+				interactable='True'
+				pref-width='25'
+				on-click='save-and-apply-env-setting'/>
 	</vertical>
 </bg>
