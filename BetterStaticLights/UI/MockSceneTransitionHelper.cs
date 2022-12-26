@@ -15,6 +15,7 @@ namespace BetterStaticLights.UI
 {
     internal class MockSceneTransitionHelper : IInitializable, IDisposable
     {
+        #region STATIC
         public static List<object> v3Environments { get; } = new List<object>()
         {
             "Weave",
@@ -48,6 +49,19 @@ namespace BetterStaticLights.UI
             { "Rock Mixtape", "RockMixtapeEnvironment" }
         };
 
+        public static string GetNormalizedSceneName(string sceneName)
+        {
+            sceneToNormalizedNames.TryGetValue(sceneName, out string value);
+            return value;
+        }
+
+        public static string GetSerializableSceneName(string sceneName)
+        {
+            normalizedToSceneNames.TryGetValue(sceneName, out string value);
+            return value;
+        }
+        #endregion
+
         [Inject] private readonly SiraLog logger;
         [Inject] private readonly MainBSLViewController mainViewController;
         [Inject] private readonly EnvironmentSettingsV3FlowCoordinator v3FlowCoordinator;
@@ -63,22 +77,11 @@ namespace BetterStaticLights.UI
 
         public void Initialize()
         {
+            // Cleanup cached objects when selecting the "Play" button to start a level
             levelView.didPressActionButtonEvent += this.Cleanup;
         }
 
-        public static string GetNormalizedSceneName(string sceneName)
-        {
-            sceneToNormalizedNames.TryGetValue(sceneName, out string value);
-            return value;
-        }
-
-        public static string GetSerializableSceneName(string sceneName)
-        {
-            normalizedToSceneNames.TryGetValue(sceneName, out string value);
-            return value;
-        }
-
-        public void Cleanup(StandardLevelDetailViewController sldvc)
+        private void Cleanup(StandardLevelDetailViewController sldvc)
         {
             SharedCoroutineStarter.instance.StartCoroutine(this.SetOrChangeEnvironmentPreview(false, destroyCachedEnvironmentObjects: true));
         }
@@ -88,7 +91,7 @@ namespace BetterStaticLights.UI
             if (string.IsNullOrWhiteSpace(environmentName))
             {
                 config.environmentPreview = "WeaveEnvironment";
-                throw new ArgumentException($"Illegal argument given for string argument 'environmentName'. Defaulting to 'WeaveEnvironment'", environmentName);
+                logger.Logger.Error($"Illegal argument given for string argument 'environmentName'.\nReceived: {environmentName}; Loading 'WeaveEnvironment'");
             }
 
             if (isEnteringPreviewState)
@@ -105,7 +108,6 @@ namespace BetterStaticLights.UI
                     SceneManager.LoadSceneAsync("GameCore", LoadSceneMode.Additive);
 
                     yield return new WaitForSecondsRealtime(1f);
-
                     mockScene = SceneManager.GetSceneByName(environmentName);
 
                     yield return UnityMainThreadTaskScheduler.Factory.StartNew(() =>
@@ -116,25 +118,36 @@ namespace BetterStaticLights.UI
 
                             obj = GameObject.Instantiate(obj, mainViewController.transform.parent, true);
                             obj.name = "BSLMock - " + obj.name;
-                            obj.name.TrimStart('(');
+                            obj.name = obj.name.Remove(obj.name.Length - 7, 7); // Remove '(Clone)' from the name
                             obj.transform.SetParent(listParent.transform);
                             mockSceneObjects.Add(obj);
                         }
 
                         env = Resources.FindObjectsOfTypeAll<EnvironmentSceneSetup>()[0]?.transform.parent.gameObject;
                         env.transform.SetParent(listParent.transform);
+                        env.name = "BSLMock - " + env.name;
 
                         core = Resources.FindObjectsOfTypeAll<GameCoreSceneSetup>()[0]?.transform.parent.gameObject;
                         AddNewMock(core.transform.Find("BloomSkyboxQuad").gameObject);
 
                         GameObject.Destroy(env.GetComponentInChildren<CoreGameHUDController>().gameObject);
-                        GameObject.Destroy(env.GetComponentInChildren<MoveAndRotateWithMainCamera>().gameObject);
+
+                        try
+                        {
+                            // This method silently throws exceptions so if it fails this method shits itself /shrug/
+                            GameObject.Destroy(env.GetComponentInChildren<MoveAndRotateWithMainCamera>());
+                        }
+                        catch { }
 
                         switch (environmentName)
                         {
                             case "PyroEnvironment":
                                 env.GetComponentsInChildren<FireEffect>().ToList().ForEach(obj => GameObject.Destroy(obj.gameObject));
+                                GameObject.Destroy(env.GetComponentInChildren<SongTimeSyncedVideoPlayer>().gameObject);
 
+                                break;
+                            case "EDMEnvironment":
+                                GameObject.Destroy(env.GetComponentInChildren<Spectrogram>());
                                 break;
                             case "TheSecondEnvironment":
                                 GameObject.Destroy(env.GetComponentInChildren<SmoothStepPositionGroupEventEffect>());
