@@ -1,14 +1,8 @@
 ﻿using BetterStaticLights.Patches;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine.SceneManagement;
-using UnityEngine;
-using Zenject;
 using SiraUtil.Logging;
-using BetterStaticLights.UI;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using Zenject;
 
 namespace BetterStaticLights.Installers
 {

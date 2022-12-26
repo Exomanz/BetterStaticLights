@@ -6,7 +6,6 @@ using BeatSaberMarkupLanguage.ViewControllers;
 using BetterStaticLights.UI.FlowCoordinators;
 using SiraUtil.Logging;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -18,12 +17,10 @@ namespace BetterStaticLights.UI.ViewControllers
     public class MainBSLViewController : BSMLAutomaticViewController
     {
         [Inject] private readonly BSLParentFlowCoordinator parentFlowCoordinator;
-        [Inject] private readonly PlayerDataModel dataModel;
         [Inject] private readonly EnvironmentSettingsV2FlowCoordinator v2FlowCoordinator;
         [Inject] private readonly EnvironmentSettingsV3FlowCoordinator v3FlowCoordinator;
-        [Inject] private readonly MockSceneTransitionHelper transitionHelper;
-        [Inject] private readonly SiraLog logger;
         [Inject] private readonly PluginConfig config;
+        [Inject] private readonly SiraLog logger;
 
         [UIParams] private readonly BSMLParserParams parser;
 
@@ -67,19 +64,14 @@ namespace BetterStaticLights.UI.ViewControllers
 
         internal void _OnButtonPress(string settingsVersion)
         {
-            switch (settingsVersion)
+            if (settingsVersion == "V2")
             {
-                case "V2":
-                    parentFlowCoordinator.PresentFlowCoordinator(v2FlowCoordinator, null, AnimationDirection.Vertical);
-                    break;
-
-                case "V3":
-                    parser.EmitEvent("hide-all");
-                    parentFlowCoordinator.PresentFlowCoordinator(v3FlowCoordinator, null, AnimationDirection.Vertical);
-                    break;
-
-                default:
-                    break;
+                parentFlowCoordinator.PresentFlowCoordinator(v2FlowCoordinator, null, AnimationDirection.Vertical);
+            }
+            else if (settingsVersion == "V3")
+            {
+                parser.EmitEvent("hide-all");
+                parentFlowCoordinator.PresentFlowCoordinator(v3FlowCoordinator, null, AnimationDirection.Vertical);
             }
         }
 

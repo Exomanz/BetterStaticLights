@@ -1,10 +1,6 @@
 ﻿using IPA.Config.Stores.Attributes;
 using IPA.Config.Stores.Converters;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BetterStaticLights.Configuration
 {

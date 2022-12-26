@@ -1,5 +1,4 @@
 ﻿using SiraUtil.Logging;
-using System.Linq;
 using UnityEngine;
 using Zenject;
 
@@ -12,7 +11,8 @@ namespace BetterStaticLights.Patches
 
         internal SiraLog logger;
 
-        [Inject] private void Construct(EnvironmentInfoSO infoSO, SiraLog logger)
+        [Inject]
+        private void Construct(EnvironmentInfoSO infoSO, SiraLog logger)
         {
             this.environmentInfoSO = infoSO;
             this.logger = logger;

@@ -1,18 +1,13 @@
-﻿//using BetterStaticLights.Installers;
-using BetterStaticLights.Configuration;
+﻿using BetterStaticLights.Configuration;
 using BetterStaticLights.Installers;
-using BetterStaticLights.Patches;
-using BetterStaticLights.UI;
 using HarmonyLib;
 using IPA;
 using IPA.Config.Stores;
-using SiraUtil.Logging;
 using SiraUtil.Zenject;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using IPAConfig = IPA.Config.Config;
 using IPALogger = IPA.Logging.Logger;
 

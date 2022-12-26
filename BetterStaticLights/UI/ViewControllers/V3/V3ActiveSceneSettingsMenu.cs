@@ -1,13 +1,13 @@
 ﻿using BeatSaberMarkupLanguage.Attributes;
+using BeatSaberMarkupLanguage.Components.Settings;
 using BeatSaberMarkupLanguage.Parser;
 using BeatSaberMarkupLanguage.ViewControllers;
-using UnityEngine;
+using SiraUtil.Logging;
 using System.Collections;
 using System.Collections.Generic;
-using Zenject;
-using BeatSaberMarkupLanguage.Components.Settings;
-using SiraUtil.Logging;
+using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 namespace BetterStaticLights.UI.ViewControllers.V3
 {

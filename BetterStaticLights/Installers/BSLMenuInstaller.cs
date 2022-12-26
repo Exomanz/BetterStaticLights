@@ -19,7 +19,7 @@ namespace BetterStaticLights.Installers
 
             // Settings Host
             BindViewController<MainBSLViewController>();
-            
+
             // V2
             BindViewController<V2LightSettingsViewController>();
             BindViewController<V2InfoViewController>();
