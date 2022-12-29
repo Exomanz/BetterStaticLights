@@ -1,4 +1,5 @@
-﻿using BetterStaticLights.UI.FlowCoordinators;
+﻿using BeatSaberMarkupLanguage;
+using BetterStaticLights.UI.FlowCoordinators;
 using BetterStaticLights.UI.ViewControllers;
 using BetterStaticLights.UI.ViewControllers.V3;
 using IPA.Utilities.Async;
@@ -68,12 +69,18 @@ namespace BetterStaticLights.UI
         [Inject] private readonly V3ActiveSceneSettingsMenu v3SceneSettings;
         [Inject] private readonly PluginConfig config;
         [Inject] private readonly StandardLevelDetailViewController levelView;
+        [Inject] private readonly PlayerDataModel playerData;
 
         public string previouslyLoadedEnvironment = null;
 
-        private Scene mockScene;
         private List<GameObject> mockSceneObjects = new List<GameObject>();
         private bool hasCopiedEnvironmentElements = false;
+
+        private Scene mockScene;
+        private LightWithIdManager lightManager;
+        private List<LightGroup> environmentLightGroups = new List<LightGroup>(501);
+        private Color playerPrimaryColorA;
+        private Color playerPrimaryColorB;
 
         public void Initialize()
         {
@@ -90,12 +97,14 @@ namespace BetterStaticLights.UI
         {
             if (string.IsNullOrWhiteSpace(environmentName))
             {
+                logger.Logger.Error($"Illegal argument given for string argument 'environmentName'.\nReceived: {environmentName ?? "null"}; Loading 'WeaveEnvironment'");
                 config.environmentPreview = "WeaveEnvironment";
-                logger.Logger.Error($"Illegal argument given for string argument 'environmentName'.\nReceived: {environmentName}; Loading 'WeaveEnvironment'");
             }
 
             if (isEnteringPreviewState)
             {
+                ColorScheme currentColorScheme = playerData.playerData.colorSchemesSettings.GetSelectedColorScheme();
+
                 if (!hasCopiedEnvironmentElements)
                 {
                     GameObject listParent = new GameObject("== BSL MOCK OBJECTS ==");
@@ -106,65 +115,101 @@ namespace BetterStaticLights.UI
 
                     SceneManager.LoadSceneAsync(environmentName, LoadSceneMode.Additive);
                     SceneManager.LoadSceneAsync("GameCore", LoadSceneMode.Additive);
-
                     yield return new WaitForSecondsRealtime(1f);
+
                     mockScene = SceneManager.GetSceneByName(environmentName);
 
+                    env = Resources.FindObjectsOfTypeAll<EnvironmentSceneSetup>()[0]?.transform.parent.gameObject;
+                    core = Resources.FindObjectsOfTypeAll<GameCoreSceneSetup>()[0]?.transform.parent.gameObject;
+
+                    env.transform.SetParent(listParent.transform);
+                    env.name = "BSLMock - Environment";
+
+                    GameObject skybox = GameObject.Instantiate(core.transform.Find("BloomSkyboxQuad").gameObject, listParent.transform, true);
+                    skybox.name = "BSLMock - BloomSkyboxQuad";
+                    mockSceneObjects.Add(skybox);
+
+                    // If ANY GameObject.Destroy() method fails, it throws a silent exception and the task return early, so I have to be VERY CAREFUL
                     yield return UnityMainThreadTaskScheduler.Factory.StartNew(() =>
                     {
-                        void AddNewMock(GameObject obj)
-                        {
-                            if (obj == null) return;
+                        // Remove Saber Sparkle Managers
+                        GameObject.Destroy(env.GetComponentInChildren<SaberBurnMarkArea>().gameObject);
+                        GameObject.Destroy(env.GetComponentInChildren<SaberBurnMarkSparkles>().gameObject);
 
-                            obj = GameObject.Instantiate(obj, mainViewController.transform.parent, true);
-                            obj.name = "BSLMock - " + obj.name;
-                            obj.name = obj.name.Remove(obj.name.Length - 7, 7); // Remove '(Clone)' from the name
-                            obj.transform.SetParent(listParent.transform);
-                            mockSceneObjects.Add(obj);
-                        }
-
-                        env = Resources.FindObjectsOfTypeAll<EnvironmentSceneSetup>()[0]?.transform.parent.gameObject;
-                        env.transform.SetParent(listParent.transform);
-                        env.name = "BSLMock - " + env.name;
-
-                        core = Resources.FindObjectsOfTypeAll<GameCoreSceneSetup>()[0]?.transform.parent.gameObject;
-                        AddNewMock(core.transform.Find("BloomSkyboxQuad").gameObject);
-
+                        // Remove HUD
                         GameObject.Destroy(env.GetComponentInChildren<CoreGameHUDController>().gameObject);
 
-                        try
-                        {
-                            // This method silently throws exceptions so if it fails this method shits itself /shrug/
-                            GameObject.Destroy(env.GetComponentInChildren<MoveAndRotateWithMainCamera>());
-                        }
-                        catch { }
+                        // Remove exception-throwing LightSwitch managers
+                        // The LightTranslationGroupEffectManager doesn't always exist, so that one has to get wrapped in a try block
+                        env.GetComponentsInChildren<LightSwitchEventEffect>().ToList().ForEach(effect => GameObject.Destroy(effect.gameObject));
+                        GameObject.Destroy(env.GetComponentInChildren<LightColorGroupEffectManager>().gameObject);
+                        GameObject.Destroy(env.GetComponentInChildren<LightRotationGroupEffectManager>().gameObject);
+
+                        logger.Logger.Info(environmentName);
 
                         switch (environmentName)
                         {
-                            case "PyroEnvironment":
-                                env.GetComponentsInChildren<FireEffect>().ToList().ForEach(obj => GameObject.Destroy(obj.gameObject));
-                                GameObject.Destroy(env.GetComponentInChildren<SongTimeSyncedVideoPlayer>().gameObject);
-
+                            // LOL
+                            case "WeaveEnvironment":
                                 break;
+
+                            // This environment is touchy...
+                            case "PyroEnvironment":
+                                env.GetComponentsInChildren<FireEffect>().ToList().ForEach(effect => GameObject.Destroy(effect));
+                                GameObject.Destroy(env.GetComponentInChildren<SongTimeSyncedVideoPlayer>().gameObject);
+                                GameObject.Destroy(env.GetComponentInChildren<EnvironmentStartEndSongAudioEffect>());
+                                GameObject.Destroy(env.GetComponentInChildren<SpectrogramRow>());
+                                GameObject.Destroy(env.GetComponentInChildren<SongTimeToShaderWriter>());
+                                break;
+
+                            // Simple enough
                             case "EDMEnvironment":
                                 GameObject.Destroy(env.GetComponentInChildren<Spectrogram>());
                                 break;
+
+                            // Cool
                             case "TheSecondEnvironment":
+                                env.GetComponentsInChildren<LightRotationEventEffect>().ToList().ForEach(effect => GameObject.Destroy(effect));
+                                GameObject.Destroy(env.GetComponentInChildren<Spectrogram>());
+                                GameObject.Destroy(env.GetComponentInChildren<MoveAndRotateWithMainCamera>());
                                 GameObject.Destroy(env.GetComponentInChildren<SmoothStepPositionGroupEventEffect>());
-
                                 break;
-                            case "LizzoEnvironment":
-                                env.GetComponentsInChildren<WhiteColorOrAlphaGroupEffectManager>().ToList().ForEach(obj => GameObject.Destroy(obj.gameObject));
 
+                            case "LizzoEnvironment":
+                                GameObject.Destroy(env.GetComponentInChildren<ParticleSystemEmitEventEffect>().gameObject);
+                                GameObject.Destroy(env.GetComponentInChildren<WhiteColorOrAlphaGroupEffectManager>().gameObject);
+                                GameObject.Destroy(env.GetComponentInChildren<MoveAndRotateWithMainCamera>());
+                                break;
+
+                            // Pogchamp
+                            case "TheWeekndEnvironment":
+                                GameObject.Destroy(env.GetComponentInChildren<MoveAndRotateWithMainCamera>());
+                                GameObject.Destroy(env.GetComponentInChildren<LightTranslationGroupEffectManager>().gameObject);
+                                break;
+
+                            case "RockMixtapeEnvironment":
+                                GameObject.Destroy(env.GetComponentInChildren<LightTranslationGroupEffectManager>().gameObject);
+                                GameObject.Destroy(env.GetComponentInChildren<SongTimeToShaderWriter>());
+                                GameObject.Destroy(env.GetComponentInChildren<Spectrogram>());
+                                GameObject.Destroy(env.GetComponentInChildren<EnvironmentStartEndSongAudioEffect>());
                                 break;
                         }
                     });
 
-                    SceneManager.UnloadSceneAsync("GameCore", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
-
                     mockSceneObjects.Add(env);
                     previouslyLoadedEnvironment = environmentName;
                     hasCopiedEnvironmentElements = true;
+
+                    SceneManager.UnloadSceneAsync("GameCore", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
+
+                    environmentLightGroups.Clear();
+                    environmentLightGroups = env.GetComponentsInChildren<LightGroup>().ToList();
+                    lightManager = env.GetComponentInChildren<LightWithIdManager>();
+                    this.RegisterEnvironmentLights();
+                    for (int i = 0; i < environmentLightGroups.Count; i++)
+                    {
+                        this.SetColorForGroup(environmentLightGroups[i], currentColorScheme.environmentColor1);
+                    }
                 }
 
                 else if (!string.Equals(config.environmentPreview, previouslyLoadedEnvironment))
@@ -178,6 +223,14 @@ namespace BetterStaticLights.UI
 
                     yield return SharedCoroutineStarter.instance.StartCoroutine(this.SetOrChangeEnvironmentPreview(true, environmentName));
                 }
+                else
+                {
+                    // Refresh ColorScheme when the previewer is launched
+                    for (int i = 0; i < environmentLightGroups.Count; i++)
+                    {
+                        this.SetColorForGroup(environmentLightGroups[i], currentColorScheme.environmentColor0);
+                    }
+                }
             }
 
             else if (destroyCachedEnvironmentObjects)
@@ -186,6 +239,7 @@ namespace BetterStaticLights.UI
                 mockSceneObjects.Clear();
                 hasCopiedEnvironmentElements = false;
 
+                // Scenes are structs and cant be null so we have to check a property of it instead lol
                 if (mockScene.name != null)
                     SceneManager.UnloadSceneAsync(mockScene, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
 
@@ -197,6 +251,29 @@ namespace BetterStaticLights.UI
             v3FlowCoordinator.isInSettingsView = isEnteringPreviewState;
 
             yield break;
+        }
+
+        public void RegisterEnvironmentLights()
+        {
+            LightWithIdMonoBehaviour[] environmentLights = lightManager.transform.parent.GetComponentsInChildren<LightWithIdMonoBehaviour>(true);
+
+            for (int i = 0; i < environmentLights.Length; i++)
+            {
+                lightManager.RegisterLight(environmentLights[i]);
+            }
+        }
+
+        private void SetColorForGroup(LightGroup group, Color color)
+        {
+            logger.Logger.Info($"Group ID: {group.groupId}; Offset: {group.startLightId}; NumberOfElements: {group.numberOfElements}");
+
+            int offset = group.startLightId;
+            int numberOfElements = group.numberOfElements;
+
+            for (int i = offset; i < offset + numberOfElements; i++)
+            {
+                this.lightManager.SetColorForId(i, color);
+            }
         }
 
         public void Dispose()

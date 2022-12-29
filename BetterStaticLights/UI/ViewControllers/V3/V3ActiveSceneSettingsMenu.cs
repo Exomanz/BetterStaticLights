@@ -48,7 +48,10 @@ namespace BetterStaticLights.UI.ViewControllers.V3
             if (!string.Equals(transitionHelper.previouslyLoadedEnvironment, MockSceneTransitionHelper.GetSerializableSceneName(value)))
             {
                 applyButton.interactable = true;
+                return;
             }
+
+            applyButton.interactable = false;
         }
 
         [UIAction("save-and-apply-env-setting")]

@@ -60,8 +60,8 @@
 				<vertical>
 					<text text='This tool lets you load a mock environment to modify your lighting experience.
 &#xA;&lt;b&gt;&lt;color=#FF5555&gt;&lt;size=125%&gt;-- LIMITATIONS --&lt;/size&gt;&lt;/color&gt;&lt;/b&gt;
-&#xA;- The environment&apos;s default color scheme is loaded; none of yours can be used.
 &#xA;- Special environment effects are &lt;b&gt;&lt;color=#FF5555&gt;not possible&lt;/color&gt;&lt;/b&gt; in-game OR in-preview.
+&#xA;- Some shaders won&apos;t look exactly as they would in-game.
 &#xA;This is still a Proof-of-Concept, so things might break or work in unexpected ways.'
 						  align='Top'/>
 				</vertical>
