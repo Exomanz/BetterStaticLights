@@ -24,11 +24,24 @@
 					  choices='v3-environment-list'
 					  value='env-setting'
 					  on-change='handle-list-did-change'/>
-		<button id='apply-button'
-				text='Apply'
-				face-color='#55FF55'
-				interactable='False'
-				pref-width='25'
-				on-click='save-and-apply-env-setting'/>
+		<list-setting id='colorscheme-list-setting'
+					  text='ColorScheme'
+					  choices='color-schemes'
+					  value='colorscheme-setting'
+					  on-change='handle-color-scheme-did-change'/>
+		<horizontal>
+			<button id='apply-scene-button' 
+					text='Apply Scene'
+					face-color='#55FF55'
+					interactable='False'
+					pref-width='25'
+					on-click='save-and-apply-env-setting'/>
+			<button id='apply-color-scheme-button'
+					text='Apply ColorScheme'
+					face-color='#55FFFF'
+					interactable='False'
+					pref-width='25'
+					on-click='save-and-apply-color-scheme'/>
+		</horizontal>
 	</vertical>
 </bg>

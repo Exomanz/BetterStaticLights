@@ -2,6 +2,7 @@
 using BeatSaberMarkupLanguage.Components.Settings;
 using BeatSaberMarkupLanguage.Parser;
 using BeatSaberMarkupLanguage.ViewControllers;
+using Polyglot;
 using SiraUtil.Logging;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,6 +21,8 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         [Inject] private readonly PluginConfig config;
         [UIParams] private readonly BSMLParserParams parser;
 
+        private ColorSchemesSettings colorSchemesSettings;
+
         [UIObject("loading-parent")]
         public GameObject loadParent;
 
@@ -29,11 +32,20 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         [UIComponent("environment-list-setting")]
         public ListSetting envListSetting;
 
-        [UIComponent("apply-button")]
-        public Button applyButton;
+        [UIComponent("colorscheme-list-setting")]
+        public ListSetting colorSchemeListSetting;
+
+        [UIComponent("apply-scene-button")]
+        public Button applySceneButton;
+
+        [UIComponent("apply-color-scheme-button")]
+        public Button applyColorSchemeButton;
 
         [UIValue("v3-environment-list")]
         public List<object> v3Environments => MockSceneTransitionHelper.v3Environments;
+
+        [UIValue("color-schemes")]
+        public List<object> colorSchemesList = new List<object>();
 
         [UIValue("env-setting")]
         public string environmentSetting
@@ -42,26 +54,59 @@ namespace BetterStaticLights.UI.ViewControllers.V3
             set => config.environmentPreview = value;
         }
 
-        [UIAction("handle-list-did-change")]
-        private void ListDidChangeEvent(string value)
+        [UIValue("colorscheme-setting")]
+        public string colorSchemeSetting
         {
-            if (!string.Equals(transitionHelper.previouslyLoadedEnvironment, MockSceneTransitionHelper.GetSerializableSceneName(value)))
-            {
-                applyButton.interactable = true;
-                return;
-            }
+            get => config.colorSchemeSetting;
+            set => config.colorSchemeSetting = value;
+        }
 
-            applyButton.interactable = false;
+        [UIAction("handle-list-did-change")]
+        private void EnvironmentDidChangeEvent(string value)
+        {
+            applySceneButton.interactable = !string.Equals(transitionHelper.previouslyLoadedEnvironment, MockSceneTransitionHelper.GetSerializableSceneName(value));
+        }
+
+        [UIAction("handle-color-scheme-did-change")]
+        private void ColorSchemeDidChangeEvent(string value)
+        {
         }
 
         [UIAction("save-and-apply-env-setting")]
-        private void Apply()
+        private void ApplyScene()
         {
             environmentSetting = MockSceneTransitionHelper.GetSerializableSceneName(envListSetting.Value.ToString());
+
             loadParent.SetActive(true);
             settingsParent.SetActive(false);
-            applyButton.interactable = false;
+            applySceneButton.interactable = false;
+
             base.StartCoroutine(this.ToggleActiveSettingsViewOrRefresh());
+        }
+
+        [UIAction("save-and-apply-color-scheme")]
+        private void ApplyColorScheme()
+        {
+        }
+
+        [Inject] 
+        internal void Construct(PlayerDataModel dataModel)
+        {
+            if (dataModel != null)
+            {
+                this.colorSchemesSettings = dataModel.playerData.colorSchemesSettings;
+                if (colorSchemesList.Count == 0)
+                {
+                    for (int i = 0; i < colorSchemesSettings.GetNumberOfColorSchemes(); i++)
+                    {
+                        ColorScheme schemeAtIdx = colorSchemesSettings.GetColorSchemeForIdx(i);
+                        if (schemeAtIdx.useNonLocalizedName)
+                            colorSchemesList.Add(schemeAtIdx.nonLocalizedName);
+                        else
+                            colorSchemesList.Add(Localization.Get(colorSchemesSettings.GetColorSchemeForIdx(i).colorSchemeNameLocalizationKey));
+                    }
+                }
+            }
         }
 
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
@@ -73,6 +118,7 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
         {
             base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
+
             loadParent.SetActive(true);
             settingsParent.SetActive(false);
         }

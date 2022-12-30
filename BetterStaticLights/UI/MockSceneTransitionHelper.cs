@@ -79,8 +79,6 @@ namespace BetterStaticLights.UI
         private Scene mockScene;
         private LightWithIdManager lightManager;
         private List<LightGroup> environmentLightGroups = new List<LightGroup>(501);
-        private Color playerPrimaryColorA;
-        private Color playerPrimaryColorB;
 
         public void Initialize()
         {

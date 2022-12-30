@@ -23,6 +23,7 @@ namespace BetterStaticLights
 
         #region V3
         public virtual string environmentPreview { get; set; } = "WeaveEnvironment";
+        public virtual string colorSchemeSetting { get; set; } = "The First";
         public virtual bool firstTimePreviewing { get; set; } = true;
 
         [UseConverter(typeof(ListConverter<EnvironmentConfigurationData>))]
