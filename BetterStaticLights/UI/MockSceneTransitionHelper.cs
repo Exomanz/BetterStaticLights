@@ -2,6 +2,7 @@
 using BetterStaticLights.UI.FlowCoordinators;
 using BetterStaticLights.UI.ViewControllers;
 using BetterStaticLights.UI.ViewControllers.V3;
+using IPA.Utilities;
 using IPA.Utilities.Async;
 using SiraUtil.Logging;
 using System;
@@ -86,11 +87,6 @@ namespace BetterStaticLights.UI
             levelView.didPressActionButtonEvent += this.Cleanup;
         }
 
-        private void Cleanup(StandardLevelDetailViewController sldvc)
-        {
-            SharedCoroutineStarter.instance.StartCoroutine(this.SetOrChangeEnvironmentPreview(false, destroyCachedEnvironmentObjects: true));
-        }
-
         public IEnumerator SetOrChangeEnvironmentPreview(bool isEnteringPreviewState, string environmentName = "WeaveEnvironment", bool destroyCachedEnvironmentObjects = false)
         {
             if (string.IsNullOrWhiteSpace(environmentName))
@@ -172,10 +168,11 @@ namespace BetterStaticLights.UI
                                 GameObject.Destroy(env.GetComponentInChildren<MoveAndRotateWithMainCamera>());
                                 GameObject.Destroy(env.GetComponentInChildren<SmoothStepPositionGroupEventEffect>());
                                 break;
-
+                                
+                            // Idk what has the WhiteColorOrAlphaGroupEffectManagers but they keep throwing even though I delete them :(
                             case "LizzoEnvironment":
-                                GameObject.Destroy(env.GetComponentInChildren<ParticleSystemEmitEventEffect>().gameObject);
-                                GameObject.Destroy(env.GetComponentInChildren<WhiteColorOrAlphaGroupEffectManager>().gameObject);
+                                env.GetComponentsInChildren<WhiteColorOrAlphaGroupEffectManager>().ToList().ForEach(effect => GameObject.Destroy(effect));
+                                env.GetComponentsInChildren<ParticleSystemEmitEventEffect>().ToList().ForEach(effect => GameObject.Destroy(effect.gameObject));
                                 GameObject.Destroy(env.GetComponentInChildren<MoveAndRotateWithMainCamera>());
                                 break;
 
@@ -203,13 +200,34 @@ namespace BetterStaticLights.UI
                     environmentLightGroups.Clear();
                     environmentLightGroups = env.GetComponentsInChildren<LightGroup>().ToList();
                     lightManager = env.GetComponentInChildren<LightWithIdManager>();
-                    this.RegisterEnvironmentLights();
+
+                    // Register the environment's lights so they can be modified
+                    LightWithIdMonoBehaviour[] lights = lightManager.transform.parent.GetComponentsInChildren<LightWithIdMonoBehaviour>(true);
+
+                    ColorArrayLightWithIds array = lightManager.transform.parent.GetComponentInChildren<ColorArrayLightWithIds>();
+                    array?.SetField<LightWithIds, LightWithIdManager>("_lightManager", lightManager);
+                    ColorArrayLightWithIds.ColorArrayLightWithId[] arrayLightIds = array?.GetField<ColorArrayLightWithIds.ColorArrayLightWithId[], ColorArrayLightWithIds>("_colorArrayLightWithIds");
+                    if (arrayLightIds != null)
+                    {
+                        for (int i = 0; i < arrayLightIds.Length; i++)
+                        {
+                            //lightManager.RegisterLight(arrayLightIds[arrayLightIds[i].lightId]);
+                        }
+                    }
+
+                    for (int i =0; i < lights.Length; i++)
+                    {
+                        lightManager.RegisterLight(lights[i]);
+                    }
+
+                    // Set Light Colors on Initial Setup
                     for (int i = 0; i < environmentLightGroups.Count; i++)
                     {
                         this.SetColorForGroup(environmentLightGroups[i], currentColorScheme.environmentColor1);
                     }
                 }
 
+                // Reset and initialize a new preview if the list value and config value are not equal
                 else if (!string.Equals(config.environmentPreview, previouslyLoadedEnvironment))
                 {
                     mockSceneObjects.ForEach(obj => GameObject.Destroy(obj));
@@ -221,9 +239,10 @@ namespace BetterStaticLights.UI
 
                     yield return SharedCoroutineStarter.instance.StartCoroutine(this.SetOrChangeEnvironmentPreview(true, environmentName));
                 }
+
                 else
                 {
-                    // Refresh ColorScheme when the previewer is launched
+                    // Refresh ColorScheme when the previewer is launched another time
                     for (int i = 0; i < environmentLightGroups.Count; i++)
                     {
                         this.SetColorForGroup(environmentLightGroups[i], currentColorScheme.environmentColor0);
@@ -251,16 +270,6 @@ namespace BetterStaticLights.UI
             yield break;
         }
 
-        public void RegisterEnvironmentLights()
-        {
-            LightWithIdMonoBehaviour[] environmentLights = lightManager.transform.parent.GetComponentsInChildren<LightWithIdMonoBehaviour>(true);
-
-            for (int i = 0; i < environmentLights.Length; i++)
-            {
-                lightManager.RegisterLight(environmentLights[i]);
-            }
-        }
-
         private void SetColorForGroup(LightGroup group, Color color)
         {
             logger.Logger.Info($"Group ID: {group.groupId}; Offset: {group.startLightId}; NumberOfElements: {group.numberOfElements}");
@@ -272,6 +281,11 @@ namespace BetterStaticLights.UI
             {
                 this.lightManager.SetColorForId(i, color);
             }
+        }
+
+        private void Cleanup(StandardLevelDetailViewController _)
+        {
+            SharedCoroutineStarter.instance.StartCoroutine(this.SetOrChangeEnvironmentPreview(false, destroyCachedEnvironmentObjects: true));
         }
 
         public void Dispose()
