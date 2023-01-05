@@ -25,10 +25,11 @@
 					  value='env-setting'
 					  on-change='handle-list-did-change'/>
 		<dropdown-list-setting id='colorscheme-list-setting'
-					  text='ColorScheme'
-					  choices='color-schemes'
-					  value='colorscheme-setting'
-					  on-change='handle-color-scheme-did-change'/>
+							   text='ColorScheme'
+							   choices='color-schemes'
+							   value='colorscheme-setting'
+							   on-change='handle-color-scheme-did-change'
+							   hover-hint='Select and apply a color scheme from this list.&#xA;&lt;color=#FF5555&gt;NOTE:&lt;/color&gt; Applying a color scheme here will also apply it to your player data for easy configuration.'/>
 		<horizontal>
 			<button id='apply-scene-button' 
 					text='Apply Scene'

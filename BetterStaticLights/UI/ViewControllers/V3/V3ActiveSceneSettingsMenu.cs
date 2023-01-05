@@ -95,6 +95,7 @@ namespace BetterStaticLights.UI.ViewControllers.V3
             colorSchemeSetting = localizedToSerializedColorSchemeIds[colorSchemeListSetting.Value.ToString()];
 
             applyColorSchemeButton.interactable = false;
+            colorSchemesSettings.selectedColorSchemeId = colorSchemeSetting;
 
             base.StartCoroutine(this.ToggleActiveSettingsViewOrRefresh());
         }
