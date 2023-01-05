@@ -19,12 +19,12 @@
 			  pad='2'
 			  spacing='2'
 			  anchor-pos-y='-17'>
-		<list-setting id='environment-list-setting' 
+		<dropdown-list-setting id='environment-list-setting' 
 					  text='Environment'
 					  choices='v3-environment-list'
 					  value='env-setting'
 					  on-change='handle-list-did-change'/>
-		<list-setting id='colorscheme-list-setting'
+		<dropdown-list-setting id='colorscheme-list-setting'
 					  text='ColorScheme'
 					  choices='color-schemes'
 					  value='colorscheme-setting'
@@ -37,10 +37,10 @@
 					pref-width='25'
 					on-click='save-and-apply-env-setting'/>
 			<button id='apply-color-scheme-button'
-					text='Apply ColorScheme'
+					text='Apply Color Scheme'
 					face-color='#55FFFF'
 					interactable='False'
-					pref-width='25'
+					pref-width='32'
 					on-click='save-and-apply-color-scheme'/>
 		</horizontal>
 	</vertical>

@@ -9,6 +9,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Zenject;
@@ -29,7 +30,7 @@ namespace BetterStaticLights.UI
             "Rock Mixtape"
         };
 
-        internal static Dictionary<string, string> sceneToNormalizedNames = new Dictionary<string, string>()
+        public static Dictionary<string, string> sceneToNormalizedNames { get; } = new Dictionary<string, string>()
         {
             { "WeaveEnvironment", "Weave" },
             { "PyroEnvironment", "Fall Out Boy" },
@@ -40,7 +41,7 @@ namespace BetterStaticLights.UI
             { "RockMixtapeEnvironment", "Rock Mixtape" }
         };
 
-        internal static Dictionary<string, string> normalizedToSceneNames = new Dictionary<string, string>()
+        public static Dictionary<string, string> normalizedToSceneNames { get; } = new Dictionary<string, string>()
         {
             { "Weave", "WeaveEnvironment" },
             { "Fall Out Boy", "PyroEnvironment" },
@@ -95,10 +96,10 @@ namespace BetterStaticLights.UI
                 config.environmentPreview = "WeaveEnvironment";
             }
 
+            ColorScheme currentColorScheme = playerData.playerData.colorSchemesSettings.GetColorSchemeForId(config.colorSchemeSetting);
+
             if (isEnteringPreviewState)
             {
-                ColorScheme currentColorScheme = playerData.playerData.colorSchemesSettings.GetSelectedColorScheme();
-
                 if (!hasCopiedEnvironmentElements)
                 {
                     GameObject listParent = new GameObject("== BSL MOCK OBJECTS ==");
@@ -114,16 +115,15 @@ namespace BetterStaticLights.UI
                     mockScene = SceneManager.GetSceneByName(environmentName);
 
                     env = Resources.FindObjectsOfTypeAll<EnvironmentSceneSetup>()[0]?.transform.parent.gameObject;
-                    core = Resources.FindObjectsOfTypeAll<GameCoreSceneSetup>()[0]?.transform.parent.gameObject;
-
                     env.transform.SetParent(listParent.transform);
                     env.name = "BSLMock - Environment";
 
+                    core = Resources.FindObjectsOfTypeAll<GameCoreSceneSetup>()[0]?.transform.parent.gameObject;
                     GameObject skybox = GameObject.Instantiate(core.transform.Find("BloomSkyboxQuad").gameObject, listParent.transform, true);
                     skybox.name = "BSLMock - BloomSkyboxQuad";
                     mockSceneObjects.Add(skybox);
 
-                    // If ANY GameObject.Destroy() method fails, it throws a silent exception and the task return early, so I have to be VERY CAREFUL
+                    // If ANY GameObject.Destroy() method fails it throws a silent exception, the task returns early, and shit breaks
                     yield return UnityMainThreadTaskScheduler.Factory.StartNew(() =>
                     {
                         // Remove Saber Sparkle Managers
@@ -134,26 +134,21 @@ namespace BetterStaticLights.UI
                         GameObject.Destroy(env.GetComponentInChildren<CoreGameHUDController>().gameObject);
 
                         // Remove exception-throwing LightSwitch managers
-                        // The LightTranslationGroupEffectManager doesn't always exist, so that one has to get wrapped in a try block
+                        // The LightTranslationGroupEffectManager doesn't always exist, so that one has to be checked
                         env.GetComponentsInChildren<LightSwitchEventEffect>().ToList().ForEach(effect => GameObject.Destroy(effect.gameObject));
                         GameObject.Destroy(env.GetComponentInChildren<LightColorGroupEffectManager>().gameObject);
                         GameObject.Destroy(env.GetComponentInChildren<LightRotationGroupEffectManager>().gameObject);
 
-                        logger.Logger.Info(environmentName);
-
                         switch (environmentName)
                         {
-                            // LOL
-                            case "WeaveEnvironment":
-                                break;
-
-                            // This environment is touchy...
+                            // This environment is touchy... god forbid you do this in a different order
                             case "PyroEnvironment":
                                 env.GetComponentsInChildren<FireEffect>().ToList().ForEach(effect => GameObject.Destroy(effect));
                                 GameObject.Destroy(env.GetComponentInChildren<SongTimeSyncedVideoPlayer>().gameObject);
                                 GameObject.Destroy(env.GetComponentInChildren<EnvironmentStartEndSongAudioEffect>());
                                 GameObject.Destroy(env.GetComponentInChildren<SpectrogramRow>());
                                 GameObject.Destroy(env.GetComponentInChildren<SongTimeToShaderWriter>());
+                                GameObject.Destroy(env.GetComponentInChildren<EnvironmentShaderWarmup>().gameObject);
                                 break;
 
                             // Simple enough
@@ -169,7 +164,7 @@ namespace BetterStaticLights.UI
                                 GameObject.Destroy(env.GetComponentInChildren<SmoothStepPositionGroupEventEffect>());
                                 break;
                                 
-                            // Idk what has the WhiteColorOrAlphaGroupEffectManagers but they keep throwing even though I delete them :(
+                            // Done
                             case "LizzoEnvironment":
                                 env.GetComponentsInChildren<WhiteColorOrAlphaGroupEffectManager>().ToList().ForEach(effect => GameObject.Destroy(effect));
                                 env.GetComponentsInChildren<ParticleSystemEmitEventEffect>().ToList().ForEach(effect => GameObject.Destroy(effect.gameObject));
@@ -182,6 +177,7 @@ namespace BetterStaticLights.UI
                                 GameObject.Destroy(env.GetComponentInChildren<LightTranslationGroupEffectManager>().gameObject);
                                 break;
 
+                            // Yeehaw
                             case "RockMixtapeEnvironment":
                                 GameObject.Destroy(env.GetComponentInChildren<LightTranslationGroupEffectManager>().gameObject);
                                 GameObject.Destroy(env.GetComponentInChildren<SongTimeToShaderWriter>());
@@ -203,28 +199,12 @@ namespace BetterStaticLights.UI
 
                     // Register the environment's lights so they can be modified
                     LightWithIdMonoBehaviour[] lights = lightManager.transform.parent.GetComponentsInChildren<LightWithIdMonoBehaviour>(true);
-
-                    ColorArrayLightWithIds array = lightManager.transform.parent.GetComponentInChildren<ColorArrayLightWithIds>();
-                    array?.SetField<LightWithIds, LightWithIdManager>("_lightManager", lightManager);
-                    ColorArrayLightWithIds.ColorArrayLightWithId[] arrayLightIds = array?.GetField<ColorArrayLightWithIds.ColorArrayLightWithId[], ColorArrayLightWithIds>("_colorArrayLightWithIds");
-                    if (arrayLightIds != null)
-                    {
-                        for (int i = 0; i < arrayLightIds.Length; i++)
-                        {
-                            //lightManager.RegisterLight(arrayLightIds[arrayLightIds[i].lightId]);
-                        }
-                    }
-
-                    for (int i =0; i < lights.Length; i++)
-                    {
+                    for (int i = 0; i < lights.Length; i++)
                         lightManager.RegisterLight(lights[i]);
-                    }
 
                     // Set Light Colors on Initial Setup
                     for (int i = 0; i < environmentLightGroups.Count; i++)
-                    {
                         this.SetColorForGroup(environmentLightGroups[i], currentColorScheme.environmentColor1);
-                    }
                 }
 
                 // Reset and initialize a new preview if the list value and config value are not equal
@@ -242,11 +222,9 @@ namespace BetterStaticLights.UI
 
                 else
                 {
-                    // Refresh ColorScheme when the previewer is launched another time
+                    // Refresh ColorScheme when the previewer is launched with the objects already cached
                     for (int i = 0; i < environmentLightGroups.Count; i++)
-                    {
-                        this.SetColorForGroup(environmentLightGroups[i], currentColorScheme.environmentColor0);
-                    }
+                        this.SetColorForGroup(environmentLightGroups[i], currentColorScheme.environmentColor1);
                 }
             }
 
@@ -267,13 +245,35 @@ namespace BetterStaticLights.UI
             mainViewController.importantMenuObjects.ForEach(go => go.SetActive(!isEnteringPreviewState));
             v3FlowCoordinator.isInSettingsView = isEnteringPreviewState;
 
+            // LITERALLY WHAT THE FUCK
+            // The ColorArrayLightWithIds' _colorsArray field is RESET when the ONENABLE METHOD IS CALLED.
+            // POGCHAMP I GUESS
+            // For what its worth, this works and uses less memory... :face_vomiting:
+            if (isEnteringPreviewState && environmentName == "RockMixtapeEnvironment")
+            {
+                ColorArrayLightWithIds mountainParent = GameObject.Find("Mountains").GetComponent<ColorArrayLightWithIds>();
+                Vector4[] colorsArray = mountainParent.GetField<Vector4[], ColorArrayLightWithIds>("_colorsArray");
+                Vector4[] newArray = new Vector4[colorsArray.Length];
+
+                for (int i = 0; i < newArray.Length; i++)
+                {
+                    newArray[i] = new Vector4(
+                        currentColorScheme.environmentColor1.r,
+                        currentColorScheme.environmentColor1.g,
+                        currentColorScheme.environmentColor1.b,
+                        currentColorScheme.environmentColor1.a
+                        );
+                }
+
+                mountainParent.SetField("_colorsArray", newArray);
+                mountainParent.SetColorDataToShader();
+            }
+
             yield break;
         }
 
         private void SetColorForGroup(LightGroup group, Color color)
         {
-            logger.Logger.Info($"Group ID: {group.groupId}; Offset: {group.startLightId}; NumberOfElements: {group.numberOfElements}");
-
             int offset = group.startLightId;
             int numberOfElements = group.numberOfElements;
 
@@ -290,8 +290,7 @@ namespace BetterStaticLights.UI
 
         public void Dispose()
         {
-            sceneToNormalizedNames.Clear();
-            normalizedToSceneNames.Clear();
+            levelView.didPressActionButtonEvent -= this.Cleanup;
         }
     }
 }

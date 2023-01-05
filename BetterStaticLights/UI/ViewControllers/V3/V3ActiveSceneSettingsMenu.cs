@@ -6,6 +6,7 @@ using Polyglot;
 using SiraUtil.Logging;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -22,6 +23,8 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         [UIParams] private readonly BSMLParserParams parser;
 
         private ColorSchemesSettings colorSchemesSettings;
+        private List<object> serializedColorSchemeIds = new List<object>();
+        private Dictionary<string, string> localizedToSerializedColorSchemeIds = new Dictionary<string, string>();
 
         [UIObject("loading-parent")]
         public GameObject loadParent;
@@ -30,10 +33,10 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         public GameObject settingsParent;
 
         [UIComponent("environment-list-setting")]
-        public ListSetting envListSetting;
+        public DropDownListSetting envListSetting;
 
         [UIComponent("colorscheme-list-setting")]
-        public ListSetting colorSchemeListSetting;
+        public DropDownListSetting colorSchemeListSetting;
 
         [UIComponent("apply-scene-button")]
         public Button applySceneButton;
@@ -61,6 +64,7 @@ namespace BetterStaticLights.UI.ViewControllers.V3
             set => config.colorSchemeSetting = value;
         }
 
+#pragma warning disable IDE0051
         [UIAction("handle-list-did-change")]
         private void EnvironmentDidChangeEvent(string value)
         {
@@ -70,6 +74,7 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         [UIAction("handle-color-scheme-did-change")]
         private void ColorSchemeDidChangeEvent(string value)
         {
+            applyColorSchemeButton.interactable = !string.Equals(config.colorSchemeSetting, localizedToSerializedColorSchemeIds[value]);
         }
 
         [UIAction("save-and-apply-env-setting")]
@@ -87,8 +92,14 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         [UIAction("save-and-apply-color-scheme")]
         private void ApplyColorScheme()
         {
+            colorSchemeSetting = localizedToSerializedColorSchemeIds[colorSchemeListSetting.Value.ToString()];
+
+            applyColorSchemeButton.interactable = false;
+
+            base.StartCoroutine(this.ToggleActiveSettingsViewOrRefresh());
         }
 
+#pragma warning restore IDE0051
         [Inject] 
         internal void Construct(PlayerDataModel dataModel)
         {
@@ -100,10 +111,19 @@ namespace BetterStaticLights.UI.ViewControllers.V3
                     for (int i = 0; i < colorSchemesSettings.GetNumberOfColorSchemes(); i++)
                     {
                         ColorScheme schemeAtIdx = colorSchemesSettings.GetColorSchemeForIdx(i);
+                        serializedColorSchemeIds.Add(schemeAtIdx.colorSchemeId);
+
                         if (schemeAtIdx.useNonLocalizedName)
+                        {
                             colorSchemesList.Add(schemeAtIdx.nonLocalizedName);
+                            localizedToSerializedColorSchemeIds.Add(schemeAtIdx.nonLocalizedName, schemeAtIdx.colorSchemeId);
+                        }
                         else
-                            colorSchemesList.Add(Localization.Get(colorSchemesSettings.GetColorSchemeForIdx(i).colorSchemeNameLocalizationKey));
+                        {
+                            string localizedName = Localization.Get(schemeAtIdx.colorSchemeNameLocalizationKey);
+                            colorSchemesList.Add(localizedName);
+                            localizedToSerializedColorSchemeIds.Add(localizedName, schemeAtIdx.colorSchemeId);
+                        }
                     }
                 }
             }
