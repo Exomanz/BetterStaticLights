@@ -1,7 +1,6 @@
-﻿using BeatSaberMarkupLanguage;
+﻿using BetterStaticLights.Configuration;
 using BetterStaticLights.UI.FlowCoordinators;
 using BetterStaticLights.UI.ViewControllers;
-using BetterStaticLights.UI.ViewControllers.V3;
 using IPA.Utilities;
 using IPA.Utilities.Async;
 using SiraUtil.Logging;
@@ -9,14 +8,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Zenject;
 
 namespace BetterStaticLights.UI
 {
-    internal class MockSceneTransitionHelper : IInitializable, IDisposable
+    internal class MockSceneTransitionHelper
     {
         #region STATIC
         public static List<object> v3Environments { get; } = new List<object>()
@@ -67,36 +65,36 @@ namespace BetterStaticLights.UI
 
         [Inject] private readonly SiraLog logger;
         [Inject] private readonly MainBSLViewController mainViewController;
-        [Inject] private readonly EnvironmentSettingsV3FlowCoordinator v3FlowCoordinator;
-        [Inject] private readonly V3ActiveSceneSettingsMenu v3SceneSettings;
-        [Inject] private readonly PluginConfig config;
-        [Inject] private readonly StandardLevelDetailViewController levelView;
         [Inject] private readonly PlayerDataModel playerData;
 
+        public event Action<bool> previewerDidFinishEvent = delegate { };
         public string previouslyLoadedEnvironment = null;
+        public List<LightGroup> environmentLightGroups = new List<LightGroup>(501);
 
         private List<GameObject> mockSceneObjects = new List<GameObject>();
+        private PreviewerConfigurationData previewerData;
         private bool hasCopiedEnvironmentElements = false;
-
         private Scene mockScene;
         private LightWithIdManager lightManager;
-        private List<LightGroup> environmentLightGroups = new List<LightGroup>(501);
 
-        public void Initialize()
+        [Inject] internal void Construct(StandardLevelDetailViewController sdlvc, PluginConfig config)
         {
-            // Cleanup cached objects when selecting the "Play" button to start a level
-            levelView.didPressActionButtonEvent += this.Cleanup;
+            this.previewerData = config.previewerConfigurationData;
+            sdlvc.didPressActionButtonEvent -= this.Cleanup;
+            sdlvc.didPressActionButtonEvent += this.Cleanup;
         }
 
         public IEnumerator SetOrChangeEnvironmentPreview(bool isEnteringPreviewState, string environmentName = "WeaveEnvironment", bool destroyCachedEnvironmentObjects = false)
         {
+            this.previewerDidFinishEvent?.Invoke(false);
+
             if (string.IsNullOrWhiteSpace(environmentName))
             {
-                logger.Logger.Error($"Illegal argument given for string argument 'environmentName'.\nReceived: {environmentName ?? "null"}; Loading 'WeaveEnvironment'");
-                config.environmentPreview = "WeaveEnvironment";
+                logger.Logger.Error($"Illegal argument given for string argument 'environmentName'.\nReceived: {environmentName!}; Loading 'WeaveEnvironment'");
+                previewerData.selectedEnvironmentPreview = "WeaveEnvironment";
             }
 
-            ColorScheme currentColorScheme = playerData.playerData.colorSchemesSettings.GetColorSchemeForId(config.colorSchemeSetting);
+            ColorScheme currentColorScheme = playerData.playerData.colorSchemesSettings.GetColorSchemeForId(previewerData.colorSchemeKey);
 
             if (isEnteringPreviewState)
             {
@@ -149,6 +147,7 @@ namespace BetterStaticLights.UI
                                 GameObject.Destroy(env.GetComponentInChildren<SpectrogramRow>());
                                 GameObject.Destroy(env.GetComponentInChildren<SongTimeToShaderWriter>());
                                 GameObject.Destroy(env.GetComponentInChildren<EnvironmentShaderWarmup>().gameObject);
+                                env.transform.Find("GradientBackgroundPyro").GetComponent<BloomPrePassBackgroundColorsGradient>().tintColor = Color.clear;
                                 break;
 
                             // Simple enough
@@ -162,6 +161,7 @@ namespace BetterStaticLights.UI
                                 GameObject.Destroy(env.GetComponentInChildren<Spectrogram>());
                                 GameObject.Destroy(env.GetComponentInChildren<MoveAndRotateWithMainCamera>());
                                 GameObject.Destroy(env.GetComponentInChildren<SmoothStepPositionGroupEventEffect>());
+                                env.GetComponentsInChildren<DirectionalLight>().ToList().ForEach(light => light.color = Color.clear);
                                 break;
                                 
                             // Done
@@ -187,8 +187,8 @@ namespace BetterStaticLights.UI
                         }
                     });
 
-                    mockSceneObjects.Add(env);
                     previouslyLoadedEnvironment = environmentName;
+                    mockSceneObjects.Add(env);
                     hasCopiedEnvironmentElements = true;
 
                     SceneManager.UnloadSceneAsync("GameCore", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
@@ -204,18 +204,18 @@ namespace BetterStaticLights.UI
 
                     // Set Light Colors on Initial Setup
                     for (int i = 0; i < environmentLightGroups.Count; i++)
-                        this.SetColorForGroup(environmentLightGroups[i], currentColorScheme.environmentColor1);
+                        this.SetColorForGroup(environmentLightGroups[i], currentColorScheme.environmentColor0);
                 }
 
                 // Reset and initialize a new preview if the list value and config value are not equal
-                else if (!string.Equals(config.environmentPreview, previouslyLoadedEnvironment))
+                else if (!string.Equals(previewerData.selectedEnvironmentPreview, previouslyLoadedEnvironment))
                 {
                     mockSceneObjects.ForEach(obj => GameObject.Destroy(obj));
                     mockSceneObjects.Clear();
                     SceneManager.UnloadSceneAsync(mockScene, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
 
                     hasCopiedEnvironmentElements = false;
-                    previouslyLoadedEnvironment = config.environmentPreview;
+                    previouslyLoadedEnvironment = previewerData.selectedEnvironmentPreview;
 
                     yield return SharedCoroutineStarter.instance.StartCoroutine(this.SetOrChangeEnvironmentPreview(true, environmentName));
                 }
@@ -224,7 +224,7 @@ namespace BetterStaticLights.UI
                 {
                     // Refresh ColorScheme when the previewer is launched with the objects already cached
                     for (int i = 0; i < environmentLightGroups.Count; i++)
-                        this.SetColorForGroup(environmentLightGroups[i], currentColorScheme.environmentColor1);
+                        this.SetColorForGroup(environmentLightGroups[i], currentColorScheme.environmentColor0);
                 }
             }
 
@@ -243,11 +243,10 @@ namespace BetterStaticLights.UI
 
             mockSceneObjects.ForEach(obj => obj.SetActive(isEnteringPreviewState));
             mainViewController.importantMenuObjects.ForEach(go => go.SetActive(!isEnteringPreviewState));
-            v3FlowCoordinator.isInSettingsView = isEnteringPreviewState;
 
-            // LITERALLY WHAT THE FUCK
+            // litreally WHAT the FUCK
             // The ColorArrayLightWithIds' _colorsArray field is RESET when the ONENABLE METHOD IS CALLED.
-            // POGCHAMP I GUESS
+            // POGCHAMP I GUESS?
             // For what its worth, this works and uses less memory... :face_vomiting:
             if (isEnteringPreviewState && environmentName == "RockMixtapeEnvironment")
             {
@@ -258,10 +257,10 @@ namespace BetterStaticLights.UI
                 for (int i = 0; i < newArray.Length; i++)
                 {
                     newArray[i] = new Vector4(
-                        currentColorScheme.environmentColor1.r,
-                        currentColorScheme.environmentColor1.g,
-                        currentColorScheme.environmentColor1.b,
-                        currentColorScheme.environmentColor1.a
+                        currentColorScheme.environmentColor0.r,
+                        currentColorScheme.environmentColor0.g,
+                        currentColorScheme.environmentColor0.b,
+                        currentColorScheme.environmentColor0.a
                         );
                 }
 
@@ -269,6 +268,7 @@ namespace BetterStaticLights.UI
                 mountainParent.SetColorDataToShader();
             }
 
+            this.previewerDidFinishEvent.Invoke(true);
             yield break;
         }
 
@@ -278,19 +278,12 @@ namespace BetterStaticLights.UI
             int numberOfElements = group.numberOfElements;
 
             for (int i = offset; i < offset + numberOfElements; i++)
-            {
                 this.lightManager.SetColorForId(i, color);
-            }
         }
 
         private void Cleanup(StandardLevelDetailViewController _)
         {
             SharedCoroutineStarter.instance.StartCoroutine(this.SetOrChangeEnvironmentPreview(false, destroyCachedEnvironmentObjects: true));
-        }
-
-        public void Dispose()
-        {
-            levelView.didPressActionButtonEvent -= this.Cleanup;
         }
     }
 }

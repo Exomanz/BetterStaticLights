@@ -12,7 +12,7 @@
 	</vertical>
 	<vertical id='settings-parent'
 			  active='False'
-			  bg='panel-top'
+			  bg='round-rect-panel'
 			  bg-color='#000000DD'
 			  vertical-fit='PreferredSize'
 			  pref-width='90'
@@ -25,11 +25,11 @@
 					  value='env-setting'
 					  on-change='handle-list-did-change'/>
 		<dropdown-list-setting id='colorscheme-list-setting'
-							   text='ColorScheme'
+							   text='Color Scheme'
 							   choices='color-schemes'
 							   value='colorscheme-setting'
 							   on-change='handle-color-scheme-did-change'
-							   hover-hint='Select and apply a color scheme from this list.&#xA;&lt;color=#FF5555&gt;NOTE:&lt;/color&gt; Applying a color scheme here will also apply it to your player data for easy configuration.'/>
+							   hover-hint='&lt;color=#FF5555&gt;NOTE:&lt;/color&gt; Applying a color scheme here will also apply it to your player data for easy configuration.'/>
 		<horizontal>
 			<button id='apply-scene-button' 
 					text='Apply Scene'
@@ -41,7 +41,7 @@
 					text='Apply Color Scheme'
 					face-color='#55FFFF'
 					interactable='False'
-					pref-width='32'
+					pref-width='35'
 					on-click='save-and-apply-color-scheme'/>
 		</horizontal>
 	</vertical>

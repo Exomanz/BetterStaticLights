@@ -22,21 +22,7 @@ namespace BetterStaticLights
         #endregion
 
         #region V3
-        public virtual string environmentPreview { get; set; } = "WeaveEnvironment";
-        public virtual string colorSchemeSetting { get; set; } = "The First";
-        public virtual bool firstTimePreviewing { get; set; } = true;
-
-        [UseConverter(typeof(ListConverter<EnvironmentConfigurationData>))]
-        public virtual List<EnvironmentConfigurationData> environmentConfigurations { get; set; } = new List<EnvironmentConfigurationData>
-        {
-            new EnvironmentConfigurationData(0, "WeaveEnvironment", 16),
-            new EnvironmentConfigurationData(1, "PyroEnvironment", 14),
-            new EnvironmentConfigurationData(2, "EDMEnvironment", 18),
-            new EnvironmentConfigurationData(3, "TheSecondEnvironment", 14),
-            new EnvironmentConfigurationData(4, "LizzoEnvironment", 20),
-            new EnvironmentConfigurationData(5, "TheWeekndEnvironment", 35),
-            new EnvironmentConfigurationData(6, "RockMixtapeEnvironment", 38)
-        };
+        public virtual PreviewerConfigurationData previewerConfigurationData { get; set; } = new PreviewerConfigurationData("WeaveEnvironment", "User0", 0, true);
         #endregion
     }
 }

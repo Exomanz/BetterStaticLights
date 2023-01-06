@@ -21,40 +21,21 @@ namespace BetterStaticLights.UI.ViewControllers
         [Inject] private readonly EnvironmentSettingsV3FlowCoordinator v3FlowCoordinator;
         [Inject] private readonly PluginConfig config;
         [Inject] private readonly SiraLog logger;
-
         [UIParams] private readonly BSMLParserParams parser;
+
+        public List<GameObject> importantMenuObjects = new List<GameObject>();
 
         [UIComponent("v2-button")]
         internal Button v2Button;
 
-        [UIComponent("v3-button")]
-        internal Button v3Button;
-
-        [UIComponent("v3-list")]
-        internal ListSetting v3List;
-
         [UIAction("v2-button-click")]
         public void V2ButtonPress() => _OnButtonPress("V2");
 
+        [UIComponent("v3-button")]
+        internal Button v3Button;
+
         [UIAction("v3-button-click")]
         public void V3ButtonPress() => _OnButtonPress("V3");
-
-        [UIValue("v3-environment-list")]
-        public List<object> v3Environments => MockSceneTransitionHelper.v3Environments;
-
-        [UIValue("temp-value")]
-        public string environmentLoadString
-        {
-            get => MockSceneTransitionHelper.GetNormalizedSceneName(config.environmentPreview);
-            set => config.environmentPreview = value;
-        }
-
-        public List<GameObject> importantMenuObjects = new List<GameObject>();
-
-        protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
-        {
-            base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
-        }
 
         public void Start()
         {
@@ -78,9 +59,9 @@ namespace BetterStaticLights.UI.ViewControllers
         [UIAction("conditional-modal-launch")]
         internal void ConditionalModalLaunch()
         {
-            if (config.firstTimePreviewing)
+            if (config.previewerConfigurationData.isFirstTimePreviewingEver)
             {
-                //config.firstTimePreviewing = false;
+                config.previewerConfigurationData.isFirstTimePreviewingEver = false;
                 parser.EmitEvent("show-scene-load-modal");
             }
             else this._OnButtonPress("V3");

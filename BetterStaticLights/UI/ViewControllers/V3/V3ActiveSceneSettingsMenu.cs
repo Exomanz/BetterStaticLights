@@ -2,6 +2,7 @@
 using BeatSaberMarkupLanguage.Components.Settings;
 using BeatSaberMarkupLanguage.Parser;
 using BeatSaberMarkupLanguage.ViewControllers;
+using BetterStaticLights.Configuration;
 using Polyglot;
 using SiraUtil.Logging;
 using System.Collections;
@@ -19,13 +20,14 @@ namespace BetterStaticLights.UI.ViewControllers.V3
     {
         [Inject] private readonly SiraLog logger;
         [Inject] private readonly MockSceneTransitionHelper transitionHelper;
-        [Inject] private readonly PluginConfig config;
         [UIParams] private readonly BSMLParserParams parser;
 
+        private PreviewerConfigurationData previewerConfigurationData;
         private ColorSchemesSettings colorSchemesSettings;
         private List<object> serializedColorSchemeIds = new List<object>();
         private Dictionary<string, string> localizedToSerializedColorSchemeIds = new Dictionary<string, string>();
 
+        #region BSML
         [UIObject("loading-parent")]
         public GameObject loadParent;
 
@@ -53,78 +55,76 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         [UIValue("env-setting")]
         public string environmentSetting
         {
-            get => MockSceneTransitionHelper.GetNormalizedSceneName(config.environmentPreview);
-            set => config.environmentPreview = value;
+            get => MockSceneTransitionHelper.GetNormalizedSceneName(previewerConfigurationData.selectedEnvironmentPreview);
+            set => previewerConfigurationData.selectedEnvironmentPreview = value;
         }
 
         [UIValue("colorscheme-setting")]
         public string colorSchemeSetting
         {
-            get => config.colorSchemeSetting;
-            set => config.colorSchemeSetting = value;
+            get => previewerConfigurationData.colorSchemeKey;
+            set => previewerConfigurationData.colorSchemeKey = value;
         }
 
-#pragma warning disable IDE0051
+#pragma warning disable IDE0051 // Events called by BSML
         [UIAction("handle-list-did-change")]
         private void EnvironmentDidChangeEvent(string value)
         {
-            applySceneButton.interactable = !string.Equals(transitionHelper.previouslyLoadedEnvironment, MockSceneTransitionHelper.GetSerializableSceneName(value));
+            applySceneButton.interactable = !string.Equals(previewerConfigurationData.selectedEnvironmentPreview, MockSceneTransitionHelper.GetSerializableSceneName(value));
         }
 
         [UIAction("handle-color-scheme-did-change")]
         private void ColorSchemeDidChangeEvent(string value)
         {
-            applyColorSchemeButton.interactable = !string.Equals(config.colorSchemeSetting, localizedToSerializedColorSchemeIds[value]);
+            applyColorSchemeButton.interactable = !string.Equals(previewerConfigurationData.colorSchemeKey, localizedToSerializedColorSchemeIds[value]);
         }
 
         [UIAction("save-and-apply-env-setting")]
         private void ApplyScene()
         {
             environmentSetting = MockSceneTransitionHelper.GetSerializableSceneName(envListSetting.Value.ToString());
-
-            loadParent.SetActive(true);
-            settingsParent.SetActive(false);
             applySceneButton.interactable = false;
 
-            base.StartCoroutine(this.ToggleActiveSettingsViewOrRefresh());
+            base.StartCoroutine(this.transitionHelper.SetOrChangeEnvironmentPreview(true, previewerConfigurationData.selectedEnvironmentPreview));
         }
 
         [UIAction("save-and-apply-color-scheme")]
         private void ApplyColorScheme()
         {
             colorSchemeSetting = localizedToSerializedColorSchemeIds[colorSchemeListSetting.Value.ToString()];
-
             applyColorSchemeButton.interactable = false;
             colorSchemesSettings.selectedColorSchemeId = colorSchemeSetting;
 
-            base.StartCoroutine(this.ToggleActiveSettingsViewOrRefresh());
+            base.StartCoroutine(transitionHelper.SetOrChangeEnvironmentPreview(true, previewerConfigurationData.selectedEnvironmentPreview));
         }
 
 #pragma warning restore IDE0051
+        #endregion
+
         [Inject] 
-        internal void Construct(PlayerDataModel dataModel)
+        internal void Construct(PluginConfig config, PlayerDataModel dataModel)
         {
+            this.previewerConfigurationData = config.previewerConfigurationData;
+            
             if (dataModel != null)
             {
                 this.colorSchemesSettings = dataModel.playerData.colorSchemesSettings;
-                if (colorSchemesList.Count == 0)
+                colorSchemesList.Clear();
+                for (int i = 0; i < colorSchemesSettings.GetNumberOfColorSchemes(); i++)
                 {
-                    for (int i = 0; i < colorSchemesSettings.GetNumberOfColorSchemes(); i++)
-                    {
-                        ColorScheme schemeAtIdx = colorSchemesSettings.GetColorSchemeForIdx(i);
-                        serializedColorSchemeIds.Add(schemeAtIdx.colorSchemeId);
+                    ColorScheme schemeAtIdx = colorSchemesSettings.GetColorSchemeForIdx(i);
+                    serializedColorSchemeIds.Add(schemeAtIdx.colorSchemeId);
 
-                        if (schemeAtIdx.useNonLocalizedName)
-                        {
-                            colorSchemesList.Add(schemeAtIdx.nonLocalizedName);
-                            localizedToSerializedColorSchemeIds.Add(schemeAtIdx.nonLocalizedName, schemeAtIdx.colorSchemeId);
-                        }
-                        else
-                        {
-                            string localizedName = Localization.Get(schemeAtIdx.colorSchemeNameLocalizationKey);
-                            colorSchemesList.Add(localizedName);
-                            localizedToSerializedColorSchemeIds.Add(localizedName, schemeAtIdx.colorSchemeId);
-                        }
+                    if (schemeAtIdx.useNonLocalizedName)
+                    {
+                        colorSchemesList.Add(schemeAtIdx.nonLocalizedName);
+                        localizedToSerializedColorSchemeIds.Add(schemeAtIdx.nonLocalizedName, schemeAtIdx.colorSchemeId);
+                    }
+                    else
+                    {
+                        string localizedName = Localization.Get(schemeAtIdx.colorSchemeNameLocalizationKey);
+                        colorSchemesList.Add(localizedName);
+                        localizedToSerializedColorSchemeIds.Add(localizedName, schemeAtIdx.colorSchemeId);
                     }
                 }
             }
@@ -133,22 +133,21 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
             base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
-            base.StartCoroutine(this.ToggleActiveSettingsViewOrRefresh()); // Need blocking code
+            transitionHelper.previewerDidFinishEvent += ToggleParentObjects;
+
+            base.StartCoroutine(transitionHelper.SetOrChangeEnvironmentPreview(true, previewerConfigurationData.selectedEnvironmentPreview));
         }
 
         protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
         {
             base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
-
-            loadParent.SetActive(true);
-            settingsParent.SetActive(false);
+            transitionHelper.previewerDidFinishEvent -= ToggleParentObjects;
         }
 
-        private IEnumerator ToggleActiveSettingsViewOrRefresh()
+        private void ToggleParentObjects(bool state)
         {
-            yield return base.StartCoroutine(transitionHelper.SetOrChangeEnvironmentPreview(true, config.environmentPreview));
-            loadParent.SetActive(false);
-            settingsParent.SetActive(true);
+            loadParent.SetActive(!state);
+            settingsParent.SetActive(state);
         }
     }
 }

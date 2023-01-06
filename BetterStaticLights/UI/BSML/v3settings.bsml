@@ -1,5 +1,21 @@
 ﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' 
 	xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ 
 	https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
-	
+	<vertical>
+		<vertical bg='panel-top'
+				  pref-width='110'
+				  vertical-fit='PreferredSize'
+				  pad-top='1'>
+			<text text='Light Group Settings'
+				  font-size='7'
+				  italics='True'
+				  align='Center'/>
+		</vertical>
+		<vertical>
+			<dropdown-list-setting id='groupid-list-component'
+								   text='Group ID'
+								   choices='groupids'
+								   value='preview-groupid-setting'/>
+		</vertical>
+	</vertical>
 </bg>

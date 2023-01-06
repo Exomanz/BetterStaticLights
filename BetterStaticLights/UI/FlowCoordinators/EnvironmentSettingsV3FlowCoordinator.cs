@@ -8,14 +8,10 @@ namespace BetterStaticLights.UI.FlowCoordinators
 {
     internal class EnvironmentSettingsV3FlowCoordinator : FlowCoordinator
     {
-        [Inject] private readonly PluginConfig config;
-        [Inject] private readonly MainBSLViewController mainBSLViewController;
-        [Inject] private readonly MockSceneTransitionHelper transitionHelper;
         [Inject] private readonly BSLParentFlowCoordinator parentFlowCoordinator;
         [Inject] private readonly V3LightSettingsViewController settingsViewController;
         [Inject] private readonly V3ActiveSceneSettingsMenu sceneViewController;
-
-        public bool isInSettingsView = false;
+        [Inject] private readonly MockSceneTransitionHelper transitionHelper;
 
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
