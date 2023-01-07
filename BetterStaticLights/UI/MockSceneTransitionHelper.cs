@@ -175,6 +175,8 @@ namespace BetterStaticLights.UI
                             case "TheWeekndEnvironment":
                                 GameObject.Destroy(env.GetComponentInChildren<MoveAndRotateWithMainCamera>());
                                 GameObject.Destroy(env.GetComponentInChildren<LightTranslationGroupEffectManager>().gameObject);
+                                env.GetComponentsInChildren<DirectionalLight>().ToList().ForEach(light => light.color = Color.clear);
+                                env.transform.Find("GradientBackground").GetComponent<BloomPrePassBackgroundColorsGradient>().tintColor = Color.clear;
                                 break;
 
                             // Yeehaw
@@ -220,10 +222,11 @@ namespace BetterStaticLights.UI
                     yield return SharedCoroutineStarter.instance.StartCoroutine(this.SetOrChangeEnvironmentPreview(true, environmentName));
                 }
 
+                // Start the previewer like normal
                 else
                 {
                     // Refresh ColorScheme when the previewer is launched with the objects already cached
-                    for (int i = 0; i < environmentLightGroups.Count; i++)
+                    for (int i = 0; i < environmentLightGroups.Count; i++) 
                         this.SetColorForGroup(environmentLightGroups[i], currentColorScheme.environmentColor0);
                 }
             }
@@ -283,7 +286,7 @@ namespace BetterStaticLights.UI
 
         private void Cleanup(StandardLevelDetailViewController _)
         {
-            SharedCoroutineStarter.instance.StartCoroutine(this.SetOrChangeEnvironmentPreview(false, destroyCachedEnvironmentObjects: true));
+            this.SetOrChangeEnvironmentPreview(false, destroyCachedEnvironmentObjects: true);
         }
     }
 }

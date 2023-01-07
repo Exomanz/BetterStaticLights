@@ -1,6 +1,7 @@
 ﻿using BeatSaberMarkupLanguage;
 using BetterStaticLights.UI.ViewControllers;
 using BetterStaticLights.UI.ViewControllers.V3;
+using BetterStaticLights.UI.ViewControllers.V3.Nested;
 using HMUI;
 using Zenject;
 
@@ -8,10 +9,16 @@ namespace BetterStaticLights.UI.FlowCoordinators
 {
     internal class EnvironmentSettingsV3FlowCoordinator : FlowCoordinator
     {
-        [Inject] private readonly BSLParentFlowCoordinator parentFlowCoordinator;
-        [Inject] private readonly V3LightSettingsViewController settingsViewController;
-        [Inject] private readonly V3ActiveSceneSettingsMenu sceneViewController;
+        [Inject] private readonly BSLParentFlowCoordinator mainModFlowCoordinator;
         [Inject] private readonly MockSceneTransitionHelper transitionHelper;
+
+        // Main ViewControllers
+        [Inject] private readonly V3LightSettingsViewController settingsViewController;
+        [Inject] private readonly V3ActiveSceneSettingsViewController sceneViewController;
+
+        // Child (Submenu) ViewControllers
+        [Inject] private readonly LightGroupSettingsViewController lightGroupViewController;
+        [Inject] private readonly DirectionalLightSettingsViewController directionalsViewController;
 
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
@@ -27,7 +34,12 @@ namespace BetterStaticLights.UI.FlowCoordinators
         {
             base.BackButtonWasPressed(topViewController);
             base.StartCoroutine(transitionHelper.SetOrChangeEnvironmentPreview(false));
-            parentFlowCoordinator.DismissFlowCoordinator(this, null, ViewController.AnimationDirection.Vertical);
+            mainModFlowCoordinator.DismissFlowCoordinator(this, null, ViewController.AnimationDirection.Vertical);
+        }
+
+        public void ReplaceRightScreenViewController(ViewController viewController, ViewController.AnimationType animationType)
+        {
+            base.SetRightScreenViewController(viewController, animationType);
         }
     }
 }

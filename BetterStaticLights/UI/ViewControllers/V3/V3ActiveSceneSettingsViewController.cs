@@ -16,7 +16,7 @@ namespace BetterStaticLights.UI.ViewControllers.V3
 {
     [ViewDefinition("BetterStaticLights.UI.BSML.v3scene.bsml")]
     [HotReload(RelativePathToLayout = @"../../BSML/v3scene.bsml")]
-    public class V3ActiveSceneSettingsMenu : BSMLAutomaticViewController
+    public class V3ActiveSceneSettingsViewController : BSMLAutomaticViewController
     {
         [Inject] private readonly SiraLog logger;
         [Inject] private readonly MockSceneTransitionHelper transitionHelper;

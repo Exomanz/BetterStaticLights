@@ -1,21 +1,38 @@
 ﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' 
 	xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ 
 	https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
-	<vertical>
+	<vertical vertical-fit='PreferredSize'
+			  spacing='5'
+			  anchor-pos-y='5'>
 		<vertical bg='panel-top'
+				  bg-color='#00FFFF'
 				  pref-width='110'
 				  vertical-fit='PreferredSize'
-				  pad-top='1'>
-			<text text='Light Group Settings'
-				  font-size='7'
-				  italics='True'
-				  align='Center'/>
+				  pad-top='1'
+				  pad-bottom='1'>
+			<vertical bg='panel-top'
+					  bg-color='#000000'
+					  pref-width='108'
+					  vertical-fit='PreferredSize'
+					  pad-top='1'>
+				<text text='Settings'
+					  font-size='7'
+					  italics='True'
+					  align='Center'/>
+			</vertical>
 		</vertical>
-		<vertical>
-			<dropdown-list-setting id='groupid-list-component'
-								   text='Group ID'
-								   choices='groupids'
-								   value='preview-groupid-setting'/>
+		<vertical bg='round-rect-panel'
+				  bg-color='#000000DD'
+				  vertical-fit='PreferredSize'
+				  pref-width='95'
+				  pad='3'>
+			<button text='Light Group Settings'
+					on-click='lightgroups-button-was-pressed'
+					pref-width='36'/>
+
+			<button text='Directional Light Settings'
+					on-click='directionals-button-was-pressed'
+					pref-width='43'/>
 		</vertical>
 	</vertical>
 </bg>

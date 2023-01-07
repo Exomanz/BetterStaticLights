@@ -3,6 +3,8 @@ using BeatSaberMarkupLanguage.Components.Settings;
 using BeatSaberMarkupLanguage.Parser;
 using BeatSaberMarkupLanguage.ViewControllers;
 using BetterStaticLights.Configuration;
+using BetterStaticLights.UI.FlowCoordinators;
+using BetterStaticLights.UI.ViewControllers.V3.Nested;
 using SiraUtil.Logging;
 using System.Collections.Generic;
 using Zenject;
@@ -17,6 +19,10 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         [Inject] private readonly MockSceneTransitionHelper transitionHelper;
         [Inject] private readonly SiraLog logger;
 
+        [Inject] private readonly EnvironmentSettingsV3FlowCoordinator v3FlowCoordinator;
+        [Inject] private readonly DirectionalLightSettingsViewController directionalsViewController;
+        [Inject] private readonly LightGroupSettingsViewController lightGroupsViewController;
+
         private PreviewerConfigurationData previewerConfigurationData;
 
         [UIComponent("groupid-list-component")]
@@ -27,6 +33,12 @@ namespace BetterStaticLights.UI.ViewControllers.V3
 
         [UIValue("preview-groupid-setting")]
         public string groupIdSetting;
+
+        [UIAction("lightgroups-button-was-pressed")]
+        public void HandleLightGroupsButtonWasPressed() => this.HandleSubmenuButtonWasPressed(true, "LightGroups");
+
+        [UIAction("directionals-button-was-pressed")]
+        public void HandleDirectionalsButtonWasPressed() => this.HandleSubmenuButtonWasPressed(true, "Directionals");
 
         [Inject]
         internal void Construct(PluginConfig config)
@@ -40,6 +52,7 @@ namespace BetterStaticLights.UI.ViewControllers.V3
             this.gameObject.SetActive(state);
             if (state)
             {
+                return;
                 idIntegerList.values = this.PopulateLightGroupIdList();
                 idIntegerList.UpdateChoices();
                 idIntegerList.dropdown.SelectCellWithIdx(0);
@@ -56,6 +69,25 @@ namespace BetterStaticLights.UI.ViewControllers.V3
             }
 
             return list;
+        }
+
+        public void HandleSubmenuButtonWasPressed(bool isEnteringOptionsMenu, string submenuName = "")
+        {
+            if (!isEnteringOptionsMenu)
+            {
+                v3FlowCoordinator.ReplaceRightScreenViewController(this, AnimationType.Out);
+                return;
+            }
+
+            if (submenuName == "LightGroups")
+            {
+                v3FlowCoordinator.ReplaceRightScreenViewController(lightGroupsViewController, AnimationType.In);
+            }
+
+            else if (submenuName == "Directionals")
+            {
+                v3FlowCoordinator.ReplaceRightScreenViewController(directionalsViewController, AnimationType.In);
+            }
         }
     }
 }
