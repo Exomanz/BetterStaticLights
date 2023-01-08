@@ -32,7 +32,8 @@
 
 			<button text='Directional Light Settings'
 					on-click='directionals-button-was-pressed'
-					pref-width='43'/>
+					pref-width='43'
+					interactable='~should-directionals-button-be-active'/>
 		</vertical>
 	</vertical>
 </bg>

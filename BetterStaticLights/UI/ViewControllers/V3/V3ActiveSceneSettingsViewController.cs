@@ -85,7 +85,7 @@ namespace BetterStaticLights.UI.ViewControllers.V3
             environmentSetting = MockSceneTransitionHelper.GetSerializableSceneName(envListSetting.Value.ToString());
             applySceneButton.interactable = false;
 
-            base.StartCoroutine(this.transitionHelper.SetOrChangeEnvironmentPreview(true, previewerConfigurationData.selectedEnvironmentPreview));
+            this.SetPreviewer();
         }
 
         [UIAction("save-and-apply-color-scheme")]
@@ -95,7 +95,7 @@ namespace BetterStaticLights.UI.ViewControllers.V3
             applyColorSchemeButton.interactable = false;
             colorSchemesSettings.selectedColorSchemeId = colorSchemeSetting;
 
-            base.StartCoroutine(transitionHelper.SetOrChangeEnvironmentPreview(true, previewerConfigurationData.selectedEnvironmentPreview));
+            this.SetPreviewer();
         }
 
 #pragma warning restore IDE0051
@@ -105,27 +105,24 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         internal void Construct(PluginConfig config, PlayerDataModel dataModel)
         {
             this.previewerConfigurationData = config.previewerConfigurationData;
-            
-            if (dataModel != null)
-            {
-                this.colorSchemesSettings = dataModel.playerData.colorSchemesSettings;
-                colorSchemesList.Clear();
-                for (int i = 0; i < colorSchemesSettings.GetNumberOfColorSchemes(); i++)
-                {
-                    ColorScheme schemeAtIdx = colorSchemesSettings.GetColorSchemeForIdx(i);
-                    serializedColorSchemeIds.Add(schemeAtIdx.colorSchemeId);
+            this.colorSchemesSettings = dataModel.playerData.colorSchemesSettings;
+            colorSchemesList.Clear();
 
-                    if (schemeAtIdx.useNonLocalizedName)
-                    {
-                        colorSchemesList.Add(schemeAtIdx.nonLocalizedName);
-                        localizedToSerializedColorSchemeIds.Add(schemeAtIdx.nonLocalizedName, schemeAtIdx.colorSchemeId);
-                    }
-                    else
-                    {
-                        string localizedName = Localization.Get(schemeAtIdx.colorSchemeNameLocalizationKey);
-                        colorSchemesList.Add(localizedName);
-                        localizedToSerializedColorSchemeIds.Add(localizedName, schemeAtIdx.colorSchemeId);
-                    }
+            for (int i = 0; i < colorSchemesSettings.GetNumberOfColorSchemes(); i++)
+            {
+                ColorScheme schemeAtIdx = colorSchemesSettings.GetColorSchemeForIdx(i);
+                serializedColorSchemeIds.Add(schemeAtIdx.colorSchemeId);
+
+                if (schemeAtIdx.useNonLocalizedName)
+                {
+                    colorSchemesList.Add(schemeAtIdx.nonLocalizedName);
+                    localizedToSerializedColorSchemeIds.Add(schemeAtIdx.nonLocalizedName, schemeAtIdx.colorSchemeId);
+                }
+                else
+                {
+                    string localizedName = Localization.Get(schemeAtIdx.colorSchemeNameLocalizationKey);
+                    colorSchemesList.Add(localizedName);
+                    localizedToSerializedColorSchemeIds.Add(localizedName, schemeAtIdx.colorSchemeId);
                 }
             }
         }
@@ -133,21 +130,21 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
             base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
+            transitionHelper.previewerDidFinishEvent -= ToggleParentObjects;
             transitionHelper.previewerDidFinishEvent += ToggleParentObjects;
 
-            base.StartCoroutine(transitionHelper.SetOrChangeEnvironmentPreview(true, previewerConfigurationData.selectedEnvironmentPreview));
-        }
-
-        protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
-        {
-            base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
-            transitionHelper.previewerDidFinishEvent -= ToggleParentObjects;
+            this.SetPreviewer();
         }
 
         private void ToggleParentObjects(bool state)
         {
             loadParent.SetActive(!state);
             settingsParent.SetActive(state);
+        }
+
+        private void SetPreviewer()
+        {
+            base.StartCoroutine(transitionHelper.SetOrChangeEnvironmentPreview(true, previewerConfigurationData.selectedEnvironmentPreview));
         }
     }
 }

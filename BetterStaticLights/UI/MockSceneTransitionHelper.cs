@@ -68,8 +68,10 @@ namespace BetterStaticLights.UI
         [Inject] private readonly PlayerDataModel playerData;
 
         public event Action<bool> previewerDidFinishEvent = delegate { };
-        public string previouslyLoadedEnvironment = null;
+        public string previouslyLoadedEnvironment = null!;
         public List<LightGroup> environmentLightGroups = new List<LightGroup>(501);
+        public List<DirectionalLight> directionalLights = new List<DirectionalLight>();
+        public BloomPrePassBackgroundColorsGradient gradientBackground = null!;
 
         private List<GameObject> mockSceneObjects = new List<GameObject>();
         private PreviewerConfigurationData previewerData;
@@ -121,6 +123,9 @@ namespace BetterStaticLights.UI
                     skybox.name = "BSLMock - BloomSkyboxQuad";
                     mockSceneObjects.Add(skybox);
 
+                    directionalLights.Clear();
+                    gradientBackground = null!;
+
                     // If ANY GameObject.Destroy() method fails it throws a silent exception, the task returns early, and shit breaks
                     yield return UnityMainThreadTaskScheduler.Factory.StartNew(() =>
                     {
@@ -169,6 +174,9 @@ namespace BetterStaticLights.UI
                                 env.GetComponentsInChildren<WhiteColorOrAlphaGroupEffectManager>().ToList().ForEach(effect => GameObject.Destroy(effect));
                                 env.GetComponentsInChildren<ParticleSystemEmitEventEffect>().ToList().ForEach(effect => GameObject.Destroy(effect.gameObject));
                                 GameObject.Destroy(env.GetComponentInChildren<MoveAndRotateWithMainCamera>());
+
+                                env.transform.Find("GradientBackgroundLizzo").GetComponent<BloomPrePassBackgroundColorsGradient>().tintColor = Color.clear;
+                                env.GetComponentsInChildren<DirectionalLight>().ToList().ForEach(light => light.color = Color.clear);
                                 break;
 
                             // Pogchamp
@@ -185,8 +193,13 @@ namespace BetterStaticLights.UI
                                 GameObject.Destroy(env.GetComponentInChildren<SongTimeToShaderWriter>());
                                 GameObject.Destroy(env.GetComponentInChildren<Spectrogram>());
                                 GameObject.Destroy(env.GetComponentInChildren<EnvironmentStartEndSongAudioEffect>());
+                                env.transform.Find("GradientBackground").GetComponent<BloomPrePassBackgroundColorsGradient>().tintColor = Color.clear;
+                                env.GetComponentsInChildren<DirectionalLight>().ToList().ForEach(light => light.color = Color.clear);
                                 break;
                         }
+
+                        this.directionalLights = env.GetComponentsInChildren<DirectionalLight>().ToList();
+                        this.gradientBackground = env.transform.GetComponentInChildren<BloomPrePassBackgroundColorsGradient>();
                     });
 
                     previouslyLoadedEnvironment = environmentName;

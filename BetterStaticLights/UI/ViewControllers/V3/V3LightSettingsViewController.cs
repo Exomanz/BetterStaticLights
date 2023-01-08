@@ -1,12 +1,10 @@
 ﻿using BeatSaberMarkupLanguage.Attributes;
-using BeatSaberMarkupLanguage.Components.Settings;
 using BeatSaberMarkupLanguage.Parser;
 using BeatSaberMarkupLanguage.ViewControllers;
-using BetterStaticLights.Configuration;
 using BetterStaticLights.UI.FlowCoordinators;
 using BetterStaticLights.UI.ViewControllers.V3.Nested;
 using SiraUtil.Logging;
-using System.Collections.Generic;
+using System.Linq;
 using Zenject;
 
 namespace BetterStaticLights.UI.ViewControllers.V3
@@ -23,27 +21,28 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         [Inject] private readonly DirectionalLightSettingsViewController directionalsViewController;
         [Inject] private readonly LightGroupSettingsViewController lightGroupsViewController;
 
-        private PreviewerConfigurationData previewerConfigurationData;
-
-        [UIComponent("groupid-list-component")]
-        public DropDownListSetting idIntegerList;
-
-        [UIValue("groupids")]
-        public List<object> groupIds = new List<object>() { "0" };
-
-        [UIValue("preview-groupid-setting")]
-        public string groupIdSetting;
-
         [UIAction("lightgroups-button-was-pressed")]
-        public void HandleLightGroupsButtonWasPressed() => this.HandleSubmenuButtonWasPressed(true, "LightGroups");
+        public void LightGroupsButtonPress() => this.HandleSubmenuButtonWasPressed(true, "LightGroups");
 
         [UIAction("directionals-button-was-pressed")]
-        public void HandleDirectionalsButtonWasPressed() => this.HandleSubmenuButtonWasPressed(true, "Directionals");
+        public void DirectionalsButtonPress() => this.HandleSubmenuButtonWasPressed(true, "Directionals");
+
+        [UIValue("should-directionals-button-be-active")]
+        public bool shouldDirectionalsButtonBeActive
+        {
+            get => transitionHelper.directionalLights.Count > 0 || transitionHelper.gradientBackground != null!;
+        }
 
         [Inject]
         internal void Construct(PluginConfig config)
         {
-            this.previewerConfigurationData = config.previewerConfigurationData;
+            transitionHelper.previewerDidFinishEvent += HandlePreviewerDidFinishEvent;
+        }
+
+        protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
+        {
+            base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
+            transitionHelper.previewerDidFinishEvent -= HandlePreviewerDidFinishEvent;
             transitionHelper.previewerDidFinishEvent += HandlePreviewerDidFinishEvent;
         }
 
@@ -51,24 +50,7 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         {
             this.gameObject.SetActive(state);
             if (state)
-            {
-                return;
-                idIntegerList.values = this.PopulateLightGroupIdList();
-                idIntegerList.UpdateChoices();
-                idIntegerList.dropdown.SelectCellWithIdx(0);
-                groupIdSetting = "0";
-            }
-        }
-
-        private List<object> PopulateLightGroupIdList()
-        {
-            List<object> list = new List<object>();
-            for (int i = 0; i < transitionHelper.environmentLightGroups?.Count; i++)
-            {
-                list.Add(i.ToString());
-            }
-
-            return list;
+                base.NotifyPropertyChanged(nameof(shouldDirectionalsButtonBeActive));
         }
 
         public void HandleSubmenuButtonWasPressed(bool isEnteringOptionsMenu, string submenuName = "")
