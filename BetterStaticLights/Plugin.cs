@@ -1,5 +1,6 @@
 ﻿using BetterStaticLights.Configuration;
 using BetterStaticLights.Installers;
+using BetterStaticLights.Patches;
 using HarmonyLib;
 using IPA;
 using IPA.Config.Stores;
@@ -13,14 +14,13 @@ using IPALogger = IPA.Logging.Logger;
 
 namespace BetterStaticLights
 {
-    [Plugin(RuntimeOptions.DynamicInit), NoEnableDisable]
+    [Plugin(RuntimeOptions.DynamicInit)]
     public class Plugin
     {
         public static Plugin Instance { get; private set; }
         internal bool DEBUG { get; private set; } = false;
 
         internal readonly PluginConfig Config;
-        internal readonly Harmony harmony = new Harmony("com.beatsaber.exo.betterstaticlights");
         internal IPALogger Logger;
 
         [Init]
@@ -37,6 +37,8 @@ namespace BetterStaticLights
             zenjector.Install(Location.App, (Container) =>
             {
                 Container.Bind<PluginConfig>().FromInstance(this.Config).AsCached();
+                Container.BindInterfacesAndSelfTo<V2EnvironmentPatcher>().AsSingle();
+                Container.Bind<SpecificEnvironmentSettingsLoader>().ToSelf().FromInstance(new SpecificEnvironmentSettingsLoader()).AsSingle();
             });
             zenjector.Install<BSLMenuInstaller>(Location.Menu);
             zenjector.Install<BSLGameInstaller>(Location.StandardPlayer);
@@ -52,28 +54,24 @@ namespace BetterStaticLights
             }
 
             this.PopulateV2LightSetList();
-            harmony.PatchAll(System.Reflection.Assembly.GetExecutingAssembly());
         }
 
         [OnDisable]
         public void Disable()
         {
             this.PopulateV2LightSetList(false);
-            harmony.UnpatchSelf();
         }
 
         private void PopulateV2LightSetList(bool state = true)
         {
-            List<LightSetV2> setList = Config.lightSets;
-
-            if (!state) setList.Clear();
+            if (!state) Config.lightSets.Clear();
             else
             {
-                setList.Add(Config.LS_BackTop);
-                setList.Add(Config.LS_RingLights);
-                setList.Add(Config.LS_LeftLasers);
-                setList.Add(Config.LS_RightLasers);
-                setList.Add(Config.LS_BottomBackSide);
+                Config.lightSets.Add(Config.BackTop);
+                Config.lightSets.Add(Config.RingLights);
+                Config.lightSets.Add(Config.LeftLasers);
+                Config.lightSets.Add(Config.RightLasers);
+                Config.lightSets.Add(Config.BottomBackSide);
             }
         }
     }

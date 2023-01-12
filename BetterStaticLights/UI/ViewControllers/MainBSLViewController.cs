@@ -1,12 +1,9 @@
 ﻿using BeatSaberMarkupLanguage;
 using BeatSaberMarkupLanguage.Attributes;
-using BeatSaberMarkupLanguage.Components.Settings;
 using BeatSaberMarkupLanguage.Parser;
 using BeatSaberMarkupLanguage.ViewControllers;
 using BetterStaticLights.UI.FlowCoordinators;
 using SiraUtil.Logging;
-using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
@@ -23,8 +20,6 @@ namespace BetterStaticLights.UI.ViewControllers
         [Inject] private readonly SiraLog logger;
         [UIParams] private readonly BSMLParserParams parser;
 
-        public List<GameObject> importantMenuObjects = new List<GameObject>();
-
         [UIComponent("v2-button")]
         internal Button v2Button;
 
@@ -36,12 +31,6 @@ namespace BetterStaticLights.UI.ViewControllers
 
         [UIAction("v3-button-click")]
         public void V3ButtonPress() => _OnButtonPress("V3");
-
-        public void Start()
-        {
-            importantMenuObjects.Add(GameObject.Find("DefaultMenuEnvironment"));
-            importantMenuObjects.Add(GameObject.Find("MenuEnvironmentCore"));
-        }
 
         internal void _OnButtonPress(string settingsVersion)
         {
@@ -59,9 +48,9 @@ namespace BetterStaticLights.UI.ViewControllers
         [UIAction("conditional-modal-launch")]
         internal void ConditionalModalLaunch()
         {
-            if (config.previewerConfigurationData.isFirstTimePreviewingEver)
+            if (config.PreviewerConfigurationData.isFirstTimePreviewingEver)
             {
-                config.previewerConfigurationData.isFirstTimePreviewingEver = false;
+                config.PreviewerConfigurationData.isFirstTimePreviewingEver = false;
                 parser.EmitEvent("show-scene-load-modal");
             }
             else this._OnButtonPress("V3");

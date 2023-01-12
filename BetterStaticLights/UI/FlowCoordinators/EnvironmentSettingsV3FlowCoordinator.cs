@@ -16,10 +16,6 @@ namespace BetterStaticLights.UI.FlowCoordinators
         [Inject] private readonly V3LightSettingsViewController settingsViewController;
         [Inject] private readonly V3ActiveSceneSettingsViewController sceneViewController;
 
-        // Child (Submenu) ViewControllers
-        [Inject] private readonly LightGroupSettingsViewController lightGroupViewController;
-        [Inject] private readonly DirectionalLightSettingsViewController directionalsViewController;
-
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
             if (firstActivation)

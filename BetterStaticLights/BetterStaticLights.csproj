@@ -71,6 +71,10 @@
       <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="Polyglot, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\Polyglot.dll</HintPath>
@@ -143,16 +147,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\EnvironmentConfigurationData.cs" />
     <Compile Include="Configuration\PreviewerConfigurationData.cs" />
-    <Compile Include="Configuration\LightSetV3.cs" />
+    <Compile Include="Configuration\SpecificEnvironmentSettingsLoader.cs" />
+    <Compile Include="Configuration\UnityColorConverter.cs" />
     <Compile Include="DEBUG.cs" />
     <Compile Include="Configuration\LightSetV2.cs" />
     <Compile Include="Installers\BSLGameInstaller.cs" />
     <Compile Include="Installers\BSLMenuInstaller.cs" />
-    <Compile Include="Patches\V2EnvironmentLightPatcher.cs" />
-    <Compile Include="Patches\V3EnvironmentLightOverrides.cs" />
-    <Compile Include="Patches\V3EnvironmentLightPatcher.cs" />
+    <Compile Include="Patches\V2EnvironmentPatcher.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="PluginConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -74,6 +74,7 @@ namespace BetterStaticLights.UI
         public BloomPrePassBackgroundColorsGradient gradientBackground = null!;
 
         private List<GameObject> mockSceneObjects = new List<GameObject>();
+        private List<GameObject> importantMenuObjects = new List<GameObject>();
         private PreviewerConfigurationData previewerData;
         private bool hasCopiedEnvironmentElements = false;
         private Scene mockScene;
@@ -81,7 +82,10 @@ namespace BetterStaticLights.UI
 
         [Inject] internal void Construct(StandardLevelDetailViewController sdlvc, PluginConfig config)
         {
-            this.previewerData = config.previewerConfigurationData;
+            this.previewerData = config.PreviewerConfigurationData;
+            this.importantMenuObjects.Add(GameObject.Find("DefaultMenuEnvironment"));
+            this.importantMenuObjects.Add(GameObject.Find("MenuEnvironmentCore"));
+
             sdlvc.didPressActionButtonEvent -= this.Cleanup;
             sdlvc.didPressActionButtonEvent += this.Cleanup;
         }
@@ -258,7 +262,7 @@ namespace BetterStaticLights.UI
             }
 
             mockSceneObjects.ForEach(obj => obj.SetActive(isEnteringPreviewState));
-            mainViewController.importantMenuObjects.ForEach(go => go.SetActive(!isEnteringPreviewState));
+            importantMenuObjects.ForEach(go => go.SetActive(!isEnteringPreviewState));
 
             // litreally WHAT the FUCK
             // The ColorArrayLightWithIds' _colorsArray field is RESET when the ONENABLE METHOD IS CALLED.
@@ -299,7 +303,7 @@ namespace BetterStaticLights.UI
 
         private void Cleanup(StandardLevelDetailViewController _)
         {
-            this.SetOrChangeEnvironmentPreview(false, destroyCachedEnvironmentObjects: true);
+            SharedCoroutineStarter.instance.StartCoroutine(this.SetOrChangeEnvironmentPreview(false, destroyCachedEnvironmentObjects: true));
         }
     }
 }

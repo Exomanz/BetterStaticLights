@@ -20,7 +20,6 @@ namespace BetterStaticLights.UI.ViewControllers.V3
     {
         [Inject] private readonly SiraLog logger;
         [Inject] private readonly MockSceneTransitionHelper transitionHelper;
-        [UIParams] private readonly BSMLParserParams parser;
 
         private PreviewerConfigurationData previewerConfigurationData;
         private ColorSchemesSettings colorSchemesSettings;
@@ -28,6 +27,8 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         private Dictionary<string, string> localizedToSerializedColorSchemeIds = new Dictionary<string, string>();
 
         #region BSML
+        [UIParams] private readonly BSMLParserParams parser;
+
         [UIObject("loading-parent")]
         public GameObject loadParent;
 
@@ -104,7 +105,7 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         [Inject] 
         internal void Construct(PluginConfig config, PlayerDataModel dataModel)
         {
-            this.previewerConfigurationData = config.previewerConfigurationData;
+            this.previewerConfigurationData = config.PreviewerConfigurationData;
             this.colorSchemesSettings = dataModel.playerData.colorSchemesSettings;
             colorSchemesList.Clear();
 
@@ -142,9 +143,7 @@ namespace BetterStaticLights.UI.ViewControllers.V3
             settingsParent.SetActive(state);
         }
 
-        private void SetPreviewer()
-        {
+        private void SetPreviewer() =>
             base.StartCoroutine(transitionHelper.SetOrChangeEnvironmentPreview(true, previewerConfigurationData.selectedEnvironmentPreview));
-        }
     }
 }
