@@ -56,8 +56,8 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         [UIValue("env-setting")]
         public string environmentSetting
         {
-            get => MockSceneTransitionHelper.GetNormalizedSceneName(previewerConfigurationData.selectedEnvironmentPreview);
-            set => previewerConfigurationData.selectedEnvironmentPreview = value;
+            get => MockSceneTransitionHelper.GetNormalizedSceneName(previewerConfigurationData.environmentKey);
+            set => previewerConfigurationData.environmentKey = value;
         }
 
         [UIValue("colorscheme-setting")]
@@ -71,7 +71,7 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         [UIAction("handle-list-did-change")]
         private void EnvironmentDidChangeEvent(string value)
         {
-            applySceneButton.interactable = !string.Equals(previewerConfigurationData.selectedEnvironmentPreview, MockSceneTransitionHelper.GetSerializableSceneName(value));
+            applySceneButton.interactable = !string.Equals(previewerConfigurationData.environmentKey, MockSceneTransitionHelper.GetSerializableSceneName(value));
         }
 
         [UIAction("handle-color-scheme-did-change")]
@@ -144,6 +144,6 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         }
 
         private void SetPreviewer() =>
-            base.StartCoroutine(transitionHelper.SetOrChangeEnvironmentPreview(true, previewerConfigurationData.selectedEnvironmentPreview));
+            base.StartCoroutine(transitionHelper.SetOrChangeEnvironmentPreview(true, previewerConfigurationData.environmentKey));
     }
 }

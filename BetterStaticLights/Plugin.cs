@@ -34,12 +34,7 @@ namespace BetterStaticLights
             Logger = logger;
 
             zenjector.UseLogger(logger);
-            zenjector.Install(Location.App, (Container) =>
-            {
-                Container.Bind<PluginConfig>().FromInstance(this.Config).AsCached();
-                Container.BindInterfacesAndSelfTo<V2EnvironmentPatcher>().AsSingle();
-                Container.Bind<SpecificEnvironmentSettingsLoader>().ToSelf().FromInstance(new SpecificEnvironmentSettingsLoader()).AsSingle();
-            });
+            zenjector.Install<BSLAppInstaller>(Location.App, this.Config);
             zenjector.Install<BSLMenuInstaller>(Location.Menu);
             zenjector.Install<BSLGameInstaller>(Location.StandardPlayer);
         }

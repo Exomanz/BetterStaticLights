@@ -97,7 +97,7 @@ namespace BetterStaticLights.UI
             if (string.IsNullOrWhiteSpace(environmentName))
             {
                 logger.Logger.Error($"Illegal argument given for string argument 'environmentName'.\nReceived: {environmentName!}; Loading 'WeaveEnvironment'");
-                previewerData.selectedEnvironmentPreview = "WeaveEnvironment";
+                previewerData.environmentKey = "WeaveEnvironment";
             }
 
             ColorScheme currentColorScheme = playerData.playerData.colorSchemesSettings.GetColorSchemeForId(previewerData.colorSchemeKey);
@@ -227,14 +227,14 @@ namespace BetterStaticLights.UI
                 }
 
                 // Reset and initialize a new preview if the list value and config value are not equal
-                else if (!string.Equals(previewerData.selectedEnvironmentPreview, previouslyLoadedEnvironment))
+                else if (!string.Equals(previewerData.environmentKey, previouslyLoadedEnvironment))
                 {
                     mockSceneObjects.ForEach(obj => GameObject.Destroy(obj));
                     mockSceneObjects.Clear();
                     SceneManager.UnloadSceneAsync(mockScene, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
 
                     hasCopiedEnvironmentElements = false;
-                    previouslyLoadedEnvironment = previewerData.selectedEnvironmentPreview;
+                    previouslyLoadedEnvironment = previewerData.environmentKey;
 
                     yield return SharedCoroutineStarter.instance.StartCoroutine(this.SetOrChangeEnvironmentPreview(true, environmentName));
                 }

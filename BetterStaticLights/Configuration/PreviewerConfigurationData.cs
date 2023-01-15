@@ -2,15 +2,15 @@
 {
     internal class PreviewerConfigurationData
     {
-        public string selectedEnvironmentPreview = "WeaveEnvironment";
+        public string environmentKey = "WeaveEnvironment";
         public string colorSchemeKey = "User0";
         public bool isFirstTimePreviewingEver = true;
 
         public PreviewerConfigurationData() { }
 
-        internal PreviewerConfigurationData(string selectedEnvironmentPreview, string selectedColorSchemeKey, bool isFirstTimePreviewingEver)
+        internal PreviewerConfigurationData(string environmentKey, string selectedColorSchemeKey, bool isFirstTimePreviewingEver)
         {
-            this.selectedEnvironmentPreview = selectedEnvironmentPreview;
+            this.environmentKey = environmentKey;
             this.colorSchemeKey = selectedColorSchemeKey;
             this.isFirstTimePreviewingEver = isFirstTimePreviewingEver;
         }

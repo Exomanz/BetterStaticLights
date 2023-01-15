@@ -149,9 +149,9 @@
   <ItemGroup>
     <Compile Include="Configuration\PreviewerConfigurationData.cs" />
     <Compile Include="Configuration\SpecificEnvironmentSettingsLoader.cs" />
-    <Compile Include="Configuration\UnityColorConverter.cs" />
     <Compile Include="DEBUG.cs" />
     <Compile Include="Configuration\LightSetV2.cs" />
+    <Compile Include="Installers\BSLAppInstaller.cs" />
     <Compile Include="Installers\BSLGameInstaller.cs" />
     <Compile Include="Installers\BSLMenuInstaller.cs" />
     <Compile Include="Patches\V2EnvironmentPatcher.cs" />

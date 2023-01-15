@@ -1,13 +1,13 @@
-﻿using IPA.Config.Stores.Converters;
-using IPA.Utilities;
+﻿using IPA.Utilities;
 using Newtonsoft.Json;
+using SiraUtil.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using IPALogger = IPA.Logging.Logger;
+using Zenject;
 
 namespace BetterStaticLights.Configuration
 {
@@ -78,8 +78,13 @@ namespace BetterStaticLights.Configuration
             {
                 _groupId = groupId;
                 _enabled = enabled;
-                _brightness = brightness;
                 _groupColor = groupColor;
+
+                if (brightness > 1)
+                {
+                    brightness /= brightness;
+                    _brightness = brightness;
+                }
             }
         }
 
@@ -109,12 +114,16 @@ namespace BetterStaticLights.Configuration
             public static string[] FileNames => new string[7] { "WeaveEnvironment.json", "PyroEnvironment.json", "EDMEnvironment.json", "TheSecondEnvironment.json", "LizzoEnvironment.json", "TheWeekndEnvironment.json", "RockMixtapeEnvironment.json" };
         }
 
-        private IPALogger logger => Plugin.Instance.Logger;
+        private SiraLog logger;
+        private PluginConfig config;
         private JsonSerializerSettings serializerSettings;
         private SpecificEnvironmentSettings activelyLoadedSettings;
 
-        public SpecificEnvironmentSettingsLoader()
+        internal SpecificEnvironmentSettingsLoader(SiraLog logger, PluginConfig config)
         {
+            this.logger = logger;
+            this.config = config;
+
             serializerSettings = new JsonSerializerSettings()
             {
                 NullValueHandling = NullValueHandling.Ignore,
@@ -126,10 +135,17 @@ namespace BetterStaticLights.Configuration
             if (!this.ValidateDirectoryIntegrity(out bool filesInDirectory))
             {
                 if (!filesInDirectory)
-                {
                     this.InitializeDirectory();
-                }
+                return;
+
             }
+
+            this.InitLoader();
+        }
+
+        public async void InitLoader()
+        {
+            this.activelyLoadedSettings = await this.LoadEnvironmentSettings(config.PreviewerConfigurationData.environmentKey);
         }
 
         private bool ValidateDirectoryIntegrity(out bool filesInDirectory)
@@ -197,7 +213,7 @@ namespace BetterStaticLights.Configuration
             try
             {
                 using StreamWriter streamWriter = new StreamWriter(pathToWriteTo, false);
-                string jsonContent = JsonConvert.SerializeObject(environmentSettings, Formatting.Indented, new UnityColorConverter(typeof(SpecificEnvironmentSettings)));
+                string jsonContent = JsonConvert.SerializeObject(environmentSettings, serializerSettings);
                 await streamWriter.WriteAsync(jsonContent);
                 return;
             }
