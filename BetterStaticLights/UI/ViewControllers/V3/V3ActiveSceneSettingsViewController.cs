@@ -143,7 +143,9 @@ namespace BetterStaticLights.UI.ViewControllers.V3
             settingsParent.SetActive(state);
         }
 
-        private void SetPreviewer() =>
-            base.StartCoroutine(transitionHelper.SetOrChangeEnvironmentPreview(true, previewerConfigurationData.environmentKey));
+        private void SetPreviewer()
+        {
+            transitionHelper?.Update(true, previewerConfigurationData.environmentKey);
+        }
     }
 }

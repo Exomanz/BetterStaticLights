@@ -2,14 +2,12 @@
 using Newtonsoft.Json;
 using SiraUtil.Logging;
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using Zenject;
 
 namespace BetterStaticLights.Configuration
 {
@@ -52,18 +50,16 @@ namespace BetterStaticLights.Configuration
                 _hasGradientBackground = hasGradientBackground;
                 _gradientLightSettings = hasGradientBackground ? gradientLightSettings : null!;
 
-                this.CreateDataStructures(lightGroupsCount, directionalLightsCount, true, gradientLightSettings);
+                this.FillData(lightGroupsCount, directionalLightsCount, true, gradientLightSettings);
             }
 
-            private void CreateDataStructures(int lightGroupsCount, int directionalLightsCount, bool hasGradientBackground, GradientLightSettings gradientLightSettings)
+            private void FillData(int lightGroupsCount, int directionalLightsCount, bool hasGradientBackground, GradientLightSettings gradientLightSettings)
             {
-                // Create and populate LightGroupSettings
                 for (int i = 0; i < lightGroupsCount; i++)
                 {
                     _lightGroupSettings.Add(new LightGroupSettings(i, new Color(0, 0, 0)));
                 }
 
-                // Create and populate DirectionalLightSettings
                 for (int i = 0; i < directionalLightsCount; i++)
                 {
                     _directionalLightSettings.Add(new DirectionalLightSettings(i));
@@ -160,6 +156,8 @@ namespace BetterStaticLights.Configuration
         private JsonSerializerSettings serializerSettings;
         private SpecificEnvironmentSettings activelyLoadedSettings;
 
+        public SpecificEnvironmentSettings ActivelyLoadedSettings => activelyLoadedSettings;
+
         internal SpecificEnvironmentSettingsLoader(SiraLog logger, PluginConfig config)
         {
             this.logger = logger;
@@ -172,48 +170,6 @@ namespace BetterStaticLights.Configuration
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                 Formatting = Formatting.Indented,
             };
-
-            if (!this.ValidateDirectoryIntegrity(out bool filesInDirectory))
-            {
-                logger.Info(filesInDirectory);
-
-                if (!filesInDirectory)
-                    this.InitializeDirectory();
-
-                return;
-
-            }
-
-            this.InitLoader();
-        }
-
-        public async void InitLoader()
-        {
-            this.activelyLoadedSettings = await this.LoadEnvironmentSettings(config.PreviewerConfigurationData.environmentKey);
-        }
-
-        private bool ValidateDirectoryIntegrity(out bool filesInDirectory)
-        {
-            filesInDirectory = true;
-
-            if (Directory.Exists(LoaderConstants.ConfigurationPath))
-            {
-                int countFilesInDirectory = Directory.GetFiles(LoaderConstants.ConfigurationPath).Length;
-                if (countFilesInDirectory < LoaderConstants.FileNames.Length)
-                {
-                    filesInDirectory = false;
-                    return false;
-                }
-
-                return true;
-            }
-
-            else
-            {
-                Directory.CreateDirectory(LoaderConstants.ConfigurationPath);
-                filesInDirectory = false;
-                return false;
-            }
         }
 
         private async void InitializeDirectory()
@@ -225,10 +181,9 @@ namespace BetterStaticLights.Configuration
             await this.SaveEnvironmentSettings(new SpecificEnvironmentSettings("LizzoEnvironment", 20, 4, true));
             await this.SaveEnvironmentSettings(new SpecificEnvironmentSettings("TheWeekndEnvironment", 35, 4, true));
             await this.SaveEnvironmentSettings(new SpecificEnvironmentSettings("RockMixtapeEnvironment", 38, 4, true));
-            activelyLoadedSettings = await this.LoadEnvironmentSettings(config.PreviewerConfigurationData.environmentKey);
         }
 
-        public async Task<SpecificEnvironmentSettings> LoadEnvironmentSettings(string fileName)
+        internal async Task<SpecificEnvironmentSettings> LoadEnvironmentSettings(string fileName)
         {
             if (fileName == null)
             {
@@ -260,7 +215,7 @@ namespace BetterStaticLights.Configuration
             return default;
         }
 
-        public async Task SaveEnvironmentSettings(SpecificEnvironmentSettings environmentSettings)
+        internal async Task SaveEnvironmentSettings(SpecificEnvironmentSettings environmentSettings)
         {
             if (environmentSettings == null)
             {

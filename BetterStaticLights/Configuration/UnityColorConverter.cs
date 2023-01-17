@@ -13,7 +13,7 @@ namespace BetterStaticLights.Configuration
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             JToken token = JToken.ReadFrom(reader);
-            if (!(token is JArray array))
+            if (token is not JArray array)
             {
                 throw new JsonReaderException($"Could not read {objectType} from json; expected a json array but got {token.Type}");
             }
@@ -29,6 +29,7 @@ namespace BetterStaticLights.Configuration
             if (value.GetType().Equals(typeof(Color)))
             {
                 Color colorValue = (Color)value;
+
                 writer.WriteStartArray();
                 writer.WriteValue(colorValue.r);
                 writer.WriteValue(colorValue.g);

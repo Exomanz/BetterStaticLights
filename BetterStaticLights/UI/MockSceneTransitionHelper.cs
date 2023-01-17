@@ -66,6 +66,7 @@ namespace BetterStaticLights.UI
         [Inject] private readonly SiraLog logger;
         [Inject] private readonly MainBSLViewController mainViewController;
         [Inject] private readonly PlayerDataModel playerData;
+        [Inject] private readonly SpecificEnvironmentSettingsLoader environmentSettingsLoader;
 
         public event Action<bool> previewerDidFinishEvent = delegate { };
         public string previouslyLoadedEnvironment = null!;
@@ -73,6 +74,7 @@ namespace BetterStaticLights.UI
         public List<DirectionalLight> directionalLights = new List<DirectionalLight>();
         public BloomPrePassBackgroundColorsGradient gradientBackground = null!;
 
+        private SpecificEnvironmentSettingsLoader.SpecificEnvironmentSettings activelyLoadedSettings;
         private List<GameObject> mockSceneObjects = new List<GameObject>();
         private List<GameObject> importantMenuObjects = new List<GameObject>();
         private PreviewerConfigurationData previewerData;
@@ -88,6 +90,19 @@ namespace BetterStaticLights.UI
 
             sdlvc.didPressActionButtonEvent -= this.Cleanup;
             sdlvc.didPressActionButtonEvent += this.Cleanup;
+        }
+
+        public async void Update(bool isEnteringPreviewState, string environmentName = "WeaveEnvironment", bool destroyCachedEnvironmentObjects = false)
+        {
+            if (activelyLoadedSettings != null)
+            {
+                await environmentSettingsLoader?.SaveEnvironmentSettings(activelyLoadedSettings);
+                activelyLoadedSettings = null;
+            }
+            if (isEnteringPreviewState)
+                activelyLoadedSettings = await environmentSettingsLoader?.LoadEnvironmentSettings(environmentName);
+
+            SharedCoroutineStarter.instance.StartCoroutine(this.SetOrChangeEnvironmentPreview(isEnteringPreviewState, environmentName, destroyCachedEnvironmentObjects));
         }
 
         public IEnumerator SetOrChangeEnvironmentPreview(bool isEnteringPreviewState, string environmentName = "WeaveEnvironment", bool destroyCachedEnvironmentObjects = false)
