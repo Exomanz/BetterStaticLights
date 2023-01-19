@@ -1,24 +1,27 @@
-﻿using IPA.Utilities;
+﻿using BeatSaberMarkupLanguage;
+using IPA.Utilities;
 using Newtonsoft.Json;
 using SiraUtil.Logging;
+using SiraUtil.Zenject;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
 namespace BetterStaticLights.Configuration
 {
-    public class SpecificEnvironmentSettingsLoader
+    public class SpecificEnvironmentSettingsLoader : IAsyncInitializable
     {
         public partial class SpecificEnvironmentSettings
         {
             private string _environmentName;
             private int _lightGroupsCount;
             private int _directionalLightsCount;
-            private bool _hasGradientBackground;
             private List<LightGroupSettings> _lightGroupSettings;
             private List<DirectionalLightSettings> _directionalLightSettings;
             private GradientLightSettings _gradientLightSettings;
@@ -26,44 +29,27 @@ namespace BetterStaticLights.Configuration
             public string EnvironmentName => _environmentName;
             public int LightGroupsCount => _lightGroupsCount;
             public int DirectionalLightsCount => _directionalLightsCount;
-            public bool HasGradientBackground => _hasGradientBackground;
             public List<LightGroupSettings> LightGroupSettings => _lightGroupSettings;
             public List<DirectionalLightSettings> DirectionalLightSettings => _directionalLightSettings;
             public GradientLightSettings GradientLightSettings => _gradientLightSettings;
 
             public SpecificEnvironmentSettings(string environmentName, int lightGroupsCount) : 
-                this(environmentName, lightGroupsCount, 0, false) 
+                this(environmentName, lightGroupsCount, 0, new GradientLightSettings()) 
             { }
 
-            public SpecificEnvironmentSettings(string environmentName, int lightGroupsCount, int directionalLightsCount, bool hasGradientBackground) :
-                this(environmentName, lightGroupsCount, new List<LightGroupSettings>(), directionalLightsCount, new List<DirectionalLightSettings>(), hasGradientBackground, new GradientLightSettings())
+            public SpecificEnvironmentSettings(string environmentName, int lightGroupsCount, int directionalLightsCount, GradientLightSettings gradientLightSettings) :
+                this(environmentName, lightGroupsCount, new List<LightGroupSettings>(), directionalLightsCount, new List<DirectionalLightSettings>(), gradientLightSettings)
             { }
 
             [JsonConstructor]
-            internal SpecificEnvironmentSettings(string environmentName, int lightGroupsCount, List<LightGroupSettings> lightGroupSettings, int directionalLightsCount, List<DirectionalLightSettings> directionalLightSettings, bool hasGradientBackground, GradientLightSettings gradientLightSettings)
+            internal SpecificEnvironmentSettings(string environmentName, int lightGroupsCount, List<LightGroupSettings> lightGroupSettings, int directionalLightsCount, List<DirectionalLightSettings> directionalLightSettings, GradientLightSettings gradientLightSettings)
             {
                 _environmentName = environmentName;
                 _lightGroupsCount = lightGroupsCount;
-                _lightGroupSettings = lightGroupSettings;
                 _directionalLightsCount = directionalLightsCount;
+                _lightGroupSettings = lightGroupSettings;
                 _directionalLightSettings = directionalLightSettings;
-                _hasGradientBackground = hasGradientBackground;
-                _gradientLightSettings = hasGradientBackground ? gradientLightSettings : null!;
-
-                this.FillData(lightGroupsCount, directionalLightsCount, true, gradientLightSettings);
-            }
-
-            private void FillData(int lightGroupsCount, int directionalLightsCount, bool hasGradientBackground, GradientLightSettings gradientLightSettings)
-            {
-                for (int i = 0; i < lightGroupsCount; i++)
-                {
-                    _lightGroupSettings.Add(new LightGroupSettings(i, new Color(0, 0, 0)));
-                }
-
-                for (int i = 0; i < directionalLightsCount; i++)
-                {
-                    _directionalLightSettings.Add(new DirectionalLightSettings(i));
-                }
+                _gradientLightSettings = gradientLightSettings;
             }
         }
 
@@ -92,8 +78,7 @@ namespace BetterStaticLights.Configuration
 
                 if (brightness > 1)
                 {
-                    brightness /= brightness;
-                    _brightness = brightness;
+                    _brightness = brightness /= brightness;
                 }
             }
         }
@@ -149,6 +134,16 @@ namespace BetterStaticLights.Configuration
         {
             public static string ConfigurationPath => Path.Combine(UnityGame.UserDataPath, "BetterStaticLights");
             public static string[] FileNames => new string[7] { "WeaveEnvironment", "PyroEnvironment", "EDMEnvironment", "TheSecondEnvironment", "LizzoEnvironment", "TheWeekndEnvironment", "RockMixtapeEnvironment" };
+            public static Dictionary<string, SpecificEnvironmentSettings> SpecificEnvironmentSettingsDictionary => new Dictionary<string, SpecificEnvironmentSettings>()
+            {
+                { "WeaveEnvironment", new SpecificEnvironmentSettings("WeaveEnvironment", 16) },
+                { "PyroEnvironment", new SpecificEnvironmentSettings("PyroEnvironment", 14, 2, new GradientLightSettings()) },
+                { "EDMEnvironment", new SpecificEnvironmentSettings("EDMEnvironment", 18) },
+                { "TheSecondEnvironment", new SpecificEnvironmentSettings("TheSecondEnvironment", 14, 5, new GradientLightSettings()) },
+                { "LizzoEnvironment", new SpecificEnvironmentSettings("LizzoEnvironment", 20, 4, new GradientLightSettings()) },
+                { "TheWeekndEnvironment", new SpecificEnvironmentSettings("TheWeekndEnvironment", 35, 4, new GradientLightSettings()) },
+                { "RockMixtapeEnvironment", new SpecificEnvironmentSettings("RockMixtapeEnvironment", 38, 4, new GradientLightSettings()) },
+            };
         }
 
         private SiraLog logger;
@@ -167,20 +162,60 @@ namespace BetterStaticLights.Configuration
             {
                 NullValueHandling = NullValueHandling.Ignore,
                 DefaultValueHandling = DefaultValueHandling.Include,
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                 Formatting = Formatting.Indented,
             };
         }
 
-        private async void InitializeDirectory()
+        public async Task InitializeAsync(CancellationToken token)
         {
-            await this.SaveEnvironmentSettings(new SpecificEnvironmentSettings("WeaveEnvironment", 16));
-            await this.SaveEnvironmentSettings(new SpecificEnvironmentSettings("PyroEnvironment", 14, 2, true));
-            await this.SaveEnvironmentSettings(new SpecificEnvironmentSettings("EDMEnvironment", 18));
-            await this.SaveEnvironmentSettings(new SpecificEnvironmentSettings("TheSecondEnvironment", 14, 5, true));
-            await this.SaveEnvironmentSettings(new SpecificEnvironmentSettings("LizzoEnvironment", 20, 4, true));
-            await this.SaveEnvironmentSettings(new SpecificEnvironmentSettings("TheWeekndEnvironment", 35, 4, true));
-            await this.SaveEnvironmentSettings(new SpecificEnvironmentSettings("RockMixtapeEnvironment", 38, 4, true));
+            await this.Verify();
+            activelyLoadedSettings = await this.LoadEnvironmentSettings(config.PreviewerConfigurationData.environmentKey);
+        }
+
+        private async Task Verify()
+        {
+            List<string> expectedFileList = LoaderConstants.FileNames.ToList();
+
+            // If the directory doesn't exist, do the setup and exit the method.
+            if (!Directory.Exists(LoaderConstants.ConfigurationPath))
+            {
+                Directory.CreateDirectory(LoaderConstants.ConfigurationPath);
+                for (int i = 0; i < LoaderConstants.FileNames.Length; i++)
+                    await this.SaveEnvironmentSettings(LoaderConstants.SpecificEnvironmentSettingsDictionary[expectedFileList[i]]);
+
+                return;
+            }
+
+            List<string> ioFileList = Directory.GetFiles(LoaderConstants.ConfigurationPath).ToList();
+            if (ioFileList.Count < expectedFileList.Count)
+            {
+                List<string> currentFileList = new List<string>();
+
+                // Trim the path (remove the C:\Program Files\...) and ".json"
+                ioFileList.ForEach(file =>
+                {
+                    file = file.Remove(0, LoaderConstants.ConfigurationPath.Length + 1);
+                    file = file.Remove(file.IndexOf('.'), 5);
+                    currentFileList.Add(file);
+                });
+
+                List<string> missingFileList = new List<string>();
+                logger.Error("Configuration directory is missing files:");
+
+                for (int i = 0; i < expectedFileList.Count; i++)
+                {
+                    // Find missing files
+                    if (!currentFileList.Contains(expectedFileList[i]))
+                    {
+                        logger.Error($"- {expectedFileList[i]}");
+                        missingFileList.Add(expectedFileList[i]);
+                    }
+                }
+
+                // Rewrite only the missing files
+                for (int i = 0; i < missingFileList.Count; i++)
+                    await this.SaveEnvironmentSettings(LoaderConstants.SpecificEnvironmentSettingsDictionary[missingFileList[i]]);
+            }
         }
 
         internal async Task<SpecificEnvironmentSettings> LoadEnvironmentSettings(string fileName)

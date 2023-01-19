@@ -92,7 +92,7 @@ namespace BetterStaticLights.UI
             sdlvc.didPressActionButtonEvent += this.Cleanup;
         }
 
-        public async void Update(bool isEnteringPreviewState, string environmentName = "WeaveEnvironment", bool destroyCachedEnvironmentObjects = false)
+        public async void RefreshPreviewer(bool isEnteringPreviewState, string environmentName = "WeaveEnvironment", bool destroyCachedEnvironmentObjects = false)
         {
             if (activelyLoadedSettings != null)
             {
@@ -111,7 +111,7 @@ namespace BetterStaticLights.UI
 
             if (string.IsNullOrWhiteSpace(environmentName))
             {
-                logger.Logger.Error($"Illegal argument given for string argument 'environmentName'.\nReceived: {environmentName!}; Loading 'WeaveEnvironment'");
+                logger.Logger.Error($"Illegal argument given for string argument 'environmentName'.\nReceived: {environmentName}; Loading 'WeaveEnvironment'");
                 previewerData.environmentKey = "WeaveEnvironment";
             }
 
@@ -153,7 +153,7 @@ namespace BetterStaticLights.UI
                         GameObject.Destroy(env.GetComponentInChildren<SaberBurnMarkSparkles>().gameObject);
 
                         // Remove HUD
-                        GameObject.Destroy(env.GetComponentInChildren<CoreGameHUDController>().gameObject);
+                        GameObject.DestroyImmediate(env.GetComponentInChildren<CoreGameHUDController>().gameObject);
 
                         // Remove exception-throwing LightSwitch managers
                         // The LightTranslationGroupEffectManager doesn't always exist, so that one has to be checked
@@ -235,10 +235,6 @@ namespace BetterStaticLights.UI
                     LightWithIdMonoBehaviour[] lights = lightManager.transform.parent.GetComponentsInChildren<LightWithIdMonoBehaviour>(true);
                     for (int i = 0; i < lights.Length; i++)
                         lightManager.RegisterLight(lights[i]);
-
-                    // Set Light Colors on Initial Setup
-                    for (int i = 0; i < environmentLightGroups.Count; i++)
-                        this.SetColorForGroup(environmentLightGroups[i], currentColorScheme.environmentColor0);
                 }
 
                 // Reset and initialize a new preview if the list value and config value are not equal
@@ -252,14 +248,6 @@ namespace BetterStaticLights.UI
                     previouslyLoadedEnvironment = previewerData.environmentKey;
 
                     yield return SharedCoroutineStarter.instance.StartCoroutine(this.SetOrChangeEnvironmentPreview(true, environmentName));
-                }
-
-                // Start the previewer like normal
-                else
-                {
-                    // Refresh ColorScheme when the previewer is launched with the objects already cached
-                    for (int i = 0; i < environmentLightGroups.Count; i++) 
-                        this.SetColorForGroup(environmentLightGroups[i], currentColorScheme.environmentColor0);
                 }
             }
 

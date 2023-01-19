@@ -85,18 +85,16 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         {
             environmentSetting = MockSceneTransitionHelper.GetSerializableSceneName(envListSetting.Value.ToString());
             applySceneButton.interactable = false;
-
-            this.SetPreviewer();
+            transitionHelper.RefreshPreviewer(true, previewerConfigurationData.environmentKey);
         }
 
         [UIAction("save-and-apply-color-scheme")]
         private void ApplyColorScheme()
         {
             colorSchemeSetting = localizedToSerializedColorSchemeIds[colorSchemeListSetting.Value.ToString()];
-            applyColorSchemeButton.interactable = false;
             colorSchemesSettings.selectedColorSchemeId = colorSchemeSetting;
-
-            this.SetPreviewer();
+            applyColorSchemeButton.interactable = false;
+            transitionHelper.RefreshPreviewer(true, previewerConfigurationData.environmentKey);
         }
 
 #pragma warning restore IDE0051
@@ -133,19 +131,13 @@ namespace BetterStaticLights.UI.ViewControllers.V3
             base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
             transitionHelper.previewerDidFinishEvent -= ToggleParentObjects;
             transitionHelper.previewerDidFinishEvent += ToggleParentObjects;
-
-            this.SetPreviewer();
+            transitionHelper.RefreshPreviewer(true, previewerConfigurationData.environmentKey);
         }
 
         private void ToggleParentObjects(bool state)
         {
             loadParent.SetActive(!state);
             settingsParent.SetActive(state);
-        }
-
-        private void SetPreviewer()
-        {
-            transitionHelper?.Update(true, previewerConfigurationData.environmentKey);
         }
     }
 }
