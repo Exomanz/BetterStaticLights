@@ -8,6 +8,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Zenject;
@@ -105,167 +106,158 @@ namespace BetterStaticLights.UI
             SharedCoroutineStarter.instance.StartCoroutine(this.SetOrChangeEnvironmentPreview(isEnteringPreviewState, environmentName, destroyCachedEnvironmentObjects));
         }
 
+        // This works... don't touch it.
         public IEnumerator SetOrChangeEnvironmentPreview(bool isEnteringPreviewState, string environmentName = "WeaveEnvironment", bool destroyCachedEnvironmentObjects = false)
         {
-            this.previewerDidFinishEvent?.Invoke(false);
+            if (destroyCachedEnvironmentObjects)
+            {
+                hasCopiedEnvironmentElements = false;
+                mockSceneObjects.ForEach(obj =>
+                {
+                    GameObject.Destroy(obj);
+                    mockSceneObjects.Remove(obj);
+                });
+
+                if (mockScene.name != null) SceneManager.UnloadSceneAsync(mockScene, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
+                yield break;
+            }
 
             if (string.IsNullOrWhiteSpace(environmentName))
             {
-                logger.Logger.Error($"Illegal argument given for string argument 'environmentName'.\nReceived: {environmentName}; Loading 'WeaveEnvironment'");
+                logger.Logger.Error($"Illegal argument given for string argument 'environmentName'. Got {environmentName}; loading 'WeaveEnvironment'");
                 previewerData.environmentKey = "WeaveEnvironment";
             }
 
-            ColorScheme currentColorScheme = playerData.playerData.colorSchemesSettings.GetColorSchemeForId(previewerData.colorSchemeKey);
+            this.previewerDidFinishEvent(false);
+            ColorScheme currentColorScheme = playerData.playerData.colorSchemesSettings.GetSelectedColorScheme();
 
             if (isEnteringPreviewState)
             {
                 if (!hasCopiedEnvironmentElements)
                 {
-                    GameObject listParent = new GameObject("== BSL MOCK OBJECTS ==");
-                    mockSceneObjects.Add(listParent);
+                    GameObject root = new GameObject("BSL | Mock Object Root");
+                    mockSceneObjects.Add(root);
 
-                    GameObject env = null!;
-                    GameObject core = null!;
+                    GameObject environmentRoot = null!;
+                    GameObject gameCoreRoot = null!;
 
                     SceneManager.LoadSceneAsync(environmentName, LoadSceneMode.Additive);
                     SceneManager.LoadSceneAsync("GameCore", LoadSceneMode.Additive);
                     yield return new WaitForSecondsRealtime(1f);
 
                     mockScene = SceneManager.GetSceneByName(environmentName);
+                    environmentRoot = Resources.FindObjectsOfTypeAll<EnvironmentSceneSetup>()[0]?.transform.parent.gameObject;
+                    environmentRoot.transform.SetParent(root.transform);
+                    environmentRoot.name = "BSLMock - Environment";
 
-                    env = Resources.FindObjectsOfTypeAll<EnvironmentSceneSetup>()[0]?.transform.parent.gameObject;
-                    env.transform.SetParent(listParent.transform);
-                    env.name = "BSLMock - Environment";
-
-                    core = Resources.FindObjectsOfTypeAll<GameCoreSceneSetup>()[0]?.transform.parent.gameObject;
-                    GameObject skybox = GameObject.Instantiate(core.transform.Find("BloomSkyboxQuad").gameObject, listParent.transform, true);
+                    gameCoreRoot = Resources.FindObjectsOfTypeAll<GameCoreSceneSetup>()[0]?.transform.parent.gameObject;
+                    GameObject skybox = GameObject.Instantiate(gameCoreRoot.transform.Find("BloomSkyboxQuad").gameObject, root.transform, true);
                     skybox.name = "BSLMock - BloomSkyboxQuad";
                     mockSceneObjects.Add(skybox);
 
                     directionalLights.Clear();
                     gradientBackground = null!;
 
-                    // If ANY GameObject.Destroy() method fails it throws a silent exception, the task returns early, and shit breaks
                     yield return UnityMainThreadTaskScheduler.Factory.StartNew(() =>
                     {
                         // Remove Saber Sparkle Managers
-                        GameObject.Destroy(env.GetComponentInChildren<SaberBurnMarkArea>().gameObject);
-                        GameObject.Destroy(env.GetComponentInChildren<SaberBurnMarkSparkles>().gameObject);
+                        GameObject.Destroy(environmentRoot.GetComponentInChildren<SaberBurnMarkArea>().gameObject);
+                        GameObject.Destroy(environmentRoot.GetComponentInChildren<SaberBurnMarkSparkles>().gameObject);
 
                         // Remove HUD
-                        GameObject.DestroyImmediate(env.GetComponentInChildren<CoreGameHUDController>().gameObject);
+                        GameObject.DestroyImmediate(environmentRoot.GetComponentInChildren<CoreGameHUDController>().gameObject);
 
                         // Remove exception-throwing LightSwitch managers
                         // The LightTranslationGroupEffectManager doesn't always exist, so that one has to be checked
-                        env.GetComponentsInChildren<LightSwitchEventEffect>().ToList().ForEach(effect => GameObject.Destroy(effect.gameObject));
-                        GameObject.Destroy(env.GetComponentInChildren<LightColorGroupEffectManager>().gameObject);
-                        GameObject.Destroy(env.GetComponentInChildren<LightRotationGroupEffectManager>().gameObject);
+                        environmentRoot.GetComponentsInChildren<LightSwitchEventEffect>().ToList().ForEach(effect => GameObject.Destroy(effect.gameObject));
+                        GameObject.Destroy(environmentRoot.GetComponentInChildren<LightColorGroupEffectManager>().gameObject);
+                        GameObject.Destroy(environmentRoot.GetComponentInChildren<LightRotationGroupEffectManager>().gameObject);
 
                         switch (environmentName)
                         {
                             // This environment is touchy... god forbid you do this in a different order
                             case "PyroEnvironment":
-                                env.GetComponentsInChildren<FireEffect>().ToList().ForEach(effect => GameObject.Destroy(effect));
-                                GameObject.Destroy(env.GetComponentInChildren<SongTimeSyncedVideoPlayer>().gameObject);
-                                GameObject.Destroy(env.GetComponentInChildren<EnvironmentStartEndSongAudioEffect>());
-                                GameObject.Destroy(env.GetComponentInChildren<SpectrogramRow>());
-                                GameObject.Destroy(env.GetComponentInChildren<SongTimeToShaderWriter>());
-                                GameObject.Destroy(env.GetComponentInChildren<EnvironmentShaderWarmup>().gameObject);
-                                env.transform.Find("GradientBackgroundPyro").GetComponent<BloomPrePassBackgroundColorsGradient>().tintColor = Color.clear;
+                                environmentRoot.GetComponentsInChildren<FireEffect>().ToList().ForEach(effect => GameObject.Destroy(effect.gameObject));
+                                GameObject.Destroy(environmentRoot.GetComponentInChildren<SongTimeSyncedVideoPlayer>().gameObject);
+                                GameObject.Destroy(environmentRoot.GetComponentInChildren<EnvironmentStartEndSongAudioEffect>());
+                                GameObject.Destroy(environmentRoot.GetComponentInChildren<SpectrogramRow>());
+                                GameObject.Destroy(environmentRoot.GetComponentInChildren<SongTimeToShaderWriter>());
+                                GameObject.Destroy(environmentRoot.GetComponentInChildren<EnvironmentShaderWarmup>().gameObject);
                                 break;
 
                             // Simple enough
                             case "EDMEnvironment":
-                                GameObject.Destroy(env.GetComponentInChildren<Spectrogram>());
+                                GameObject.Destroy(environmentRoot.GetComponentInChildren<Spectrogram>());
                                 break;
 
                             // Cool
                             case "TheSecondEnvironment":
-                                env.GetComponentsInChildren<LightRotationEventEffect>().ToList().ForEach(effect => GameObject.Destroy(effect));
-                                GameObject.Destroy(env.GetComponentInChildren<Spectrogram>());
-                                GameObject.Destroy(env.GetComponentInChildren<MoveAndRotateWithMainCamera>());
-                                GameObject.Destroy(env.GetComponentInChildren<SmoothStepPositionGroupEventEffect>());
-                                env.GetComponentsInChildren<DirectionalLight>().ToList().ForEach(light => light.color = Color.clear);
+                                environmentRoot.GetComponentsInChildren<LightRotationEventEffect>().ToList().ForEach(effect => GameObject.Destroy(effect));
+                                GameObject.Destroy(environmentRoot.GetComponentInChildren<Spectrogram>());
+                                GameObject.Destroy(environmentRoot.GetComponentInChildren<MoveAndRotateWithMainCamera>());
+                                GameObject.Destroy(environmentRoot.GetComponentInChildren<SmoothStepPositionGroupEventEffect>());
+                                environmentRoot.GetComponentsInChildren<DirectionalLight>().ToList().ForEach(light => light.color = Color.clear);
                                 break;
-                                
+
                             // Done
                             case "LizzoEnvironment":
-                                env.GetComponentsInChildren<WhiteColorOrAlphaGroupEffectManager>().ToList().ForEach(effect => GameObject.Destroy(effect));
-                                env.GetComponentsInChildren<ParticleSystemEmitEventEffect>().ToList().ForEach(effect => GameObject.Destroy(effect.gameObject));
-                                GameObject.Destroy(env.GetComponentInChildren<MoveAndRotateWithMainCamera>());
-
-                                env.transform.Find("GradientBackgroundLizzo").GetComponent<BloomPrePassBackgroundColorsGradient>().tintColor = Color.clear;
-                                env.GetComponentsInChildren<DirectionalLight>().ToList().ForEach(light => light.color = Color.clear);
+                                environmentRoot.GetComponentsInChildren<WhiteColorOrAlphaGroupEffectManager>().ToList().ForEach(effect => GameObject.Destroy(effect));
+                                environmentRoot.GetComponentsInChildren<ParticleSystemEmitEventEffect>().ToList().ForEach(effect => GameObject.Destroy(effect.gameObject));
+                                GameObject.Destroy(environmentRoot.GetComponentInChildren<MoveAndRotateWithMainCamera>());
                                 break;
 
                             // Pogchamp
                             case "TheWeekndEnvironment":
-                                GameObject.Destroy(env.GetComponentInChildren<MoveAndRotateWithMainCamera>());
-                                GameObject.Destroy(env.GetComponentInChildren<LightTranslationGroupEffectManager>().gameObject);
-                                env.GetComponentsInChildren<DirectionalLight>().ToList().ForEach(light => light.color = Color.clear);
-                                env.transform.Find("GradientBackground").GetComponent<BloomPrePassBackgroundColorsGradient>().tintColor = Color.clear;
+                                GameObject.Destroy(environmentRoot.GetComponentInChildren<MoveAndRotateWithMainCamera>());
+                                GameObject.Destroy(environmentRoot.GetComponentInChildren<LightTranslationGroupEffectManager>().gameObject);
                                 break;
 
                             // Yeehaw
                             case "RockMixtapeEnvironment":
-                                GameObject.Destroy(env.GetComponentInChildren<LightTranslationGroupEffectManager>().gameObject);
-                                GameObject.Destroy(env.GetComponentInChildren<SongTimeToShaderWriter>());
-                                GameObject.Destroy(env.GetComponentInChildren<Spectrogram>());
-                                GameObject.Destroy(env.GetComponentInChildren<EnvironmentStartEndSongAudioEffect>());
-                                env.transform.Find("GradientBackground").GetComponent<BloomPrePassBackgroundColorsGradient>().tintColor = Color.clear;
-                                env.GetComponentsInChildren<DirectionalLight>().ToList().ForEach(light => light.color = Color.clear);
+                                GameObject.Destroy(environmentRoot.GetComponentInChildren<LightTranslationGroupEffectManager>().gameObject);
+                                GameObject.Destroy(environmentRoot.GetComponentInChildren<SongTimeToShaderWriter>());
+                                GameObject.Destroy(environmentRoot.GetComponentInChildren<Spectrogram>());
+                                GameObject.Destroy(environmentRoot.GetComponentInChildren<EnvironmentStartEndSongAudioEffect>());
                                 break;
                         }
 
-                        this.directionalLights = env.GetComponentsInChildren<DirectionalLight>().ToList();
-                        this.gradientBackground = env.transform.GetComponentInChildren<BloomPrePassBackgroundColorsGradient>();
+                        this.directionalLights = environmentRoot.GetComponentsInChildren<DirectionalLight>().ToList();
+                        this.gradientBackground = environmentRoot.transform.GetComponentInChildren<BloomPrePassBackgroundColorsGradient>();
                     });
 
                     previouslyLoadedEnvironment = environmentName;
-                    mockSceneObjects.Add(env);
+                    mockSceneObjects.Add(environmentRoot);
                     hasCopiedEnvironmentElements = true;
 
                     SceneManager.UnloadSceneAsync("GameCore", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
 
                     environmentLightGroups.Clear();
-                    environmentLightGroups = env.GetComponentsInChildren<LightGroup>().ToList();
-                    lightManager = env.GetComponentInChildren<LightWithIdManager>();
+                    environmentLightGroups = environmentRoot.GetComponentsInChildren<LightGroup>().ToList();
+                    lightManager = environmentRoot.GetComponentInChildren<LightWithIdManager>();
 
-                    // Register the environment's lights so they can be modified
                     LightWithIdMonoBehaviour[] lights = lightManager.transform.parent.GetComponentsInChildren<LightWithIdMonoBehaviour>(true);
                     for (int i = 0; i < lights.Length; i++)
                         lightManager.RegisterLight(lights[i]);
                 }
 
-                // Reset and initialize a new preview if the list value and config value are not equal
-                else if (!string.Equals(previewerData.environmentKey, previouslyLoadedEnvironment))
+                else if (!string.Equals(previewerData.environmentKey, previewerData))
                 {
-                    mockSceneObjects.ForEach(obj => GameObject.Destroy(obj));
-                    mockSceneObjects.Clear();
-                    SceneManager.UnloadSceneAsync(mockScene, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
-
-                    hasCopiedEnvironmentElements = false;
                     previouslyLoadedEnvironment = previewerData.environmentKey;
+                    hasCopiedEnvironmentElements = false;
 
+                    mockSceneObjects.ForEach(obj =>
+                    {
+                        GameObject.Destroy(obj);
+                        mockSceneObjects.Remove(obj);
+                    });
+
+                    SceneManager.UnloadSceneAsync(mockScene, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
                     yield return SharedCoroutineStarter.instance.StartCoroutine(this.SetOrChangeEnvironmentPreview(true, environmentName));
                 }
             }
 
-            else if (destroyCachedEnvironmentObjects)
-            {
-                mockSceneObjects.ForEach(obj => GameObject.Destroy(obj));
-                mockSceneObjects.Clear();
-                hasCopiedEnvironmentElements = false;
-
-                // Scenes are structs and cant be null so we have to check a property of it instead lol
-                if (mockScene.name != null)
-                    SceneManager.UnloadSceneAsync(mockScene, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
-
-                yield break;
-            }
-
             mockSceneObjects.ForEach(obj => obj.SetActive(isEnteringPreviewState));
-            importantMenuObjects.ForEach(go => go.SetActive(!isEnteringPreviewState));
+            importantMenuObjects.ForEach(obj => obj.SetActive(!isEnteringPreviewState));
 
             // litreally WHAT the FUCK
             // The ColorArrayLightWithIds' _colorsArray field is RESET when the ONENABLE METHOD IS CALLED.
@@ -291,7 +283,7 @@ namespace BetterStaticLights.UI
                 mountainParent.SetColorDataToShader();
             }
 
-            this.previewerDidFinishEvent.Invoke(true);
+            this.previewerDidFinishEvent(true);
             yield break;
         }
 

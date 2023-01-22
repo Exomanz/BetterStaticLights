@@ -50,6 +50,22 @@ namespace BetterStaticLights.Configuration
                 _lightGroupSettings = lightGroupSettings;
                 _directionalLightSettings = directionalLightSettings;
                 _gradientLightSettings = gradientLightSettings;
+
+                if (lightGroupSettings.Count == 0 && directionalLightSettings.Count == 0)
+                    this.FillData();
+            }
+
+            private void FillData()
+            {
+                for (int i = 0; i < _lightGroupsCount; i++)
+                {
+                    this._lightGroupSettings.Add(new LightGroupSettings(i, Color.white));
+                }
+
+                for (int i = 0; i < _directionalLightsCount; i++)
+                {
+                    this._directionalLightSettings.Add(new DirectionalLightSettings(true, i, Color.white));
+                }
             }
         }
 

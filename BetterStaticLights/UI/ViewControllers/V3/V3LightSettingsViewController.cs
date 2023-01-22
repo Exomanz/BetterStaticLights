@@ -39,13 +39,6 @@ namespace BetterStaticLights.UI.ViewControllers.V3
             transitionHelper.previewerDidFinishEvent += HandlePreviewerDidFinishEvent;
         }
 
-        protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
-        {
-            base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
-            transitionHelper.previewerDidFinishEvent -= HandlePreviewerDidFinishEvent;
-            transitionHelper.previewerDidFinishEvent += HandlePreviewerDidFinishEvent;
-        }
-
         public void HandlePreviewerDidFinishEvent(bool state)
         {
             this.gameObject.SetActive(state);
