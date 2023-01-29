@@ -1,5 +1,4 @@
-﻿using BeatSaberMarkupLanguage;
-using IPA.Utilities;
+﻿using IPA.Utilities;
 using Newtonsoft.Json;
 using SiraUtil.Logging;
 using SiraUtil.Zenject;
@@ -7,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,8 +31,8 @@ namespace BetterStaticLights.Configuration
             public List<DirectionalLightSettings> DirectionalLightSettings => _directionalLightSettings;
             public GradientLightSettings GradientLightSettings => _gradientLightSettings;
 
-            public SpecificEnvironmentSettings(string environmentName, int lightGroupsCount) : 
-                this(environmentName, lightGroupsCount, 0, new GradientLightSettings()) 
+            public SpecificEnvironmentSettings(string environmentName, int lightGroupsCount) :
+                this(environmentName, lightGroupsCount, 0, new GradientLightSettings())
             { }
 
             public SpecificEnvironmentSettings(string environmentName, int lightGroupsCount, int directionalLightsCount, GradientLightSettings gradientLightSettings) :
@@ -207,7 +205,7 @@ namespace BetterStaticLights.Configuration
             {
                 List<string> currentFileList = new List<string>();
 
-                // Trim the path (remove the C:\Program Files\...) and ".json"
+                // Trim the path
                 ioFileList.ForEach(file =>
                 {
                     file = file.Remove(0, LoaderConstants.ConfigurationPath.Length + 1);
@@ -238,12 +236,12 @@ namespace BetterStaticLights.Configuration
         {
             if (fileName == null)
             {
-                throw new ArgumentNullException(nameof(fileName));
+                throw new ArgumentNullException(nameof(fileName), "File name cannot be null.");
             }
 
             if (!LoaderConstants.FileNames.Any(name => name.Equals(fileName)))
             {
-                throw new ArgumentException("Associated settings file does not exist!", nameof(fileName));
+                throw new ArgumentException("Associated settings file does not exist.", nameof(fileName));
             }
 
             fileName += ".json";
@@ -253,8 +251,6 @@ namespace BetterStaticLights.Configuration
                 using StreamReader streamReader = new StreamReader(pathToReadFrom, Encoding.UTF8);
                 string jsonContent = await streamReader.ReadToEndAsync();
                 SpecificEnvironmentSettings settingsObject = JsonConvert.DeserializeObject<SpecificEnvironmentSettings>(jsonContent, serializerSettings);
-
-                logger.Info("Successful read from " + fileName);
 
                 return settingsObject;
             }
@@ -280,8 +276,6 @@ namespace BetterStaticLights.Configuration
                 using StreamWriter streamWriter = new StreamWriter(pathToWriteTo, false);
                 string jsonContent = JsonConvert.SerializeObject(environmentSettings, serializerSettings);
                 await streamWriter.WriteAsync(jsonContent);
-
-                logger.Info("Successful write to " + fileName);
 
                 return;
             }

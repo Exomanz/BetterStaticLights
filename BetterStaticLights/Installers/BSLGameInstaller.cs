@@ -1,7 +1,4 @@
-﻿using BetterStaticLights.Patches;
-using SiraUtil.Logging;
-using UnityEngine;
-using UnityEngine.SceneManagement;
+﻿using SiraUtil.Logging;
 using Zenject;
 
 namespace BetterStaticLights.Installers

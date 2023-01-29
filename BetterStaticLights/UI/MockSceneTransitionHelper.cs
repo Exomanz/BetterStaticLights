@@ -1,5 +1,4 @@
 ﻿using BetterStaticLights.Configuration;
-using BetterStaticLights.UI.FlowCoordinators;
 using BetterStaticLights.UI.ViewControllers;
 using IPA.Utilities;
 using IPA.Utilities.Async;
@@ -8,7 +7,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Zenject;
@@ -83,7 +81,8 @@ namespace BetterStaticLights.UI
         private Scene mockScene;
         private LightWithIdManager lightManager;
 
-        [Inject] internal void Construct(StandardLevelDetailViewController sdlvc, PluginConfig config)
+        [Inject]
+        internal void Construct(StandardLevelDetailViewController sdlvc, PluginConfig config)
         {
             this.previewerData = config.PreviewerConfigurationData;
             this.importantMenuObjects.Add(GameObject.Find("DefaultMenuEnvironment"));
@@ -106,7 +105,7 @@ namespace BetterStaticLights.UI
             SharedCoroutineStarter.instance.StartCoroutine(this.SetOrChangeEnvironmentPreview(isEnteringPreviewState, environmentName, destroyCachedEnvironmentObjects));
         }
 
-        // This works... don't touch it.
+        // Just kidding
         public IEnumerator SetOrChangeEnvironmentPreview(bool isEnteringPreviewState, string environmentName = "WeaveEnvironment", bool destroyCachedEnvironmentObjects = false)
         {
             if (destroyCachedEnvironmentObjects)
@@ -115,8 +114,8 @@ namespace BetterStaticLights.UI
                 mockSceneObjects.ForEach(obj =>
                 {
                     GameObject.Destroy(obj);
-                    mockSceneObjects.Remove(obj);
                 });
+                mockSceneObjects.Clear();
 
                 if (mockScene.name != null) SceneManager.UnloadSceneAsync(mockScene, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
                 yield break;
@@ -177,12 +176,16 @@ namespace BetterStaticLights.UI
                         {
                             // This environment is touchy... god forbid you do this in a different order
                             case "PyroEnvironment":
-                                environmentRoot.GetComponentsInChildren<FireEffect>().ToList().ForEach(effect => GameObject.Destroy(effect.gameObject));
-                                GameObject.Destroy(environmentRoot.GetComponentInChildren<SongTimeSyncedVideoPlayer>().gameObject);
-                                GameObject.Destroy(environmentRoot.GetComponentInChildren<EnvironmentStartEndSongAudioEffect>());
-                                GameObject.Destroy(environmentRoot.GetComponentInChildren<SpectrogramRow>());
+                                environmentRoot.GetComponentsInChildren<FireEffect>().ToList().ForEach(effectObj =>
+                                {
+                                    GameObject.Destroy(effectObj.gameObject);
+                                });
+                                GameObject.Destroy(environmentRoot.transform.Find("Fire").gameObject);
+                                GameObject.Destroy(environmentRoot.GetComponentInChildren<EnvironmentShaderWarmup>());
                                 GameObject.Destroy(environmentRoot.GetComponentInChildren<SongTimeToShaderWriter>());
-                                GameObject.Destroy(environmentRoot.GetComponentInChildren<EnvironmentShaderWarmup>().gameObject);
+                                GameObject.Destroy(environmentRoot.GetComponentInChildren<SongTimeSyncedVideoPlayer>().gameObject);
+                                GameObject.Destroy(environmentRoot.GetComponentInChildren<SpectrogramRow>());
+                                GameObject.Destroy(environmentRoot.GetComponentInChildren<EnvironmentStartEndSongAudioEffect>());
                                 break;
 
                             // Simple enough
@@ -240,7 +243,7 @@ namespace BetterStaticLights.UI
                         lightManager.RegisterLight(lights[i]);
                 }
 
-                else if (!string.Equals(previewerData.environmentKey, previewerData))
+                else if (!string.Equals(previewerData.environmentKey, previouslyLoadedEnvironment))
                 {
                     previouslyLoadedEnvironment = previewerData.environmentKey;
                     hasCopiedEnvironmentElements = false;
@@ -248,8 +251,8 @@ namespace BetterStaticLights.UI
                     mockSceneObjects.ForEach(obj =>
                     {
                         GameObject.Destroy(obj);
-                        mockSceneObjects.Remove(obj);
                     });
+                    mockSceneObjects.Clear();
 
                     SceneManager.UnloadSceneAsync(mockScene, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
                     yield return SharedCoroutineStarter.instance.StartCoroutine(this.SetOrChangeEnvironmentPreview(true, environmentName));
@@ -259,28 +262,33 @@ namespace BetterStaticLights.UI
             mockSceneObjects.ForEach(obj => obj.SetActive(isEnteringPreviewState));
             importantMenuObjects.ForEach(obj => obj.SetActive(!isEnteringPreviewState));
 
-            // litreally WHAT the FUCK
-            // The ColorArrayLightWithIds' _colorsArray field is RESET when the ONENABLE METHOD IS CALLED.
-            // POGCHAMP I GUESS?
-            // For what its worth, this works and uses less memory... :face_vomiting:
-            if (isEnteringPreviewState && environmentName == "RockMixtapeEnvironment")
+            if (isEnteringPreviewState)
             {
-                ColorArrayLightWithIds mountainParent = GameObject.Find("Mountains").GetComponent<ColorArrayLightWithIds>();
-                Vector4[] colorsArray = mountainParent.GetField<Vector4[], ColorArrayLightWithIds>("_colorsArray");
-                Vector4[] newArray = new Vector4[colorsArray.Length];
-
-                for (int i = 0; i < newArray.Length; i++)
+                if (environmentName == "RockMixtapeEnvironment")
                 {
-                    newArray[i] = new Vector4(
-                        currentColorScheme.environmentColor0.r,
-                        currentColorScheme.environmentColor0.g,
-                        currentColorScheme.environmentColor0.b,
-                        currentColorScheme.environmentColor0.a
-                        );
+                    ColorArrayLightWithIds mountainParent = GameObject.Find("Mountains").GetComponent<ColorArrayLightWithIds>();
+                    Vector4[] colorsArray = mountainParent.GetField<Vector4[], ColorArrayLightWithIds>("_colorsArray");
+                    Vector4[] newArray = new Vector4[colorsArray.Length];
+
+                    for (int i = 0; i < newArray.Length; i++)
+                    {
+                        newArray[i] = new Vector4(
+                            currentColorScheme.environmentColor0.r,
+                            currentColorScheme.environmentColor0.g,
+                            currentColorScheme.environmentColor0.b,
+                            currentColorScheme.environmentColor0.a
+                            );
+                    }
+
+                    mountainParent.SetField("_colorsArray", newArray);
+                    mountainParent.SetColorDataToShader();
                 }
 
-                mountainParent.SetField("_colorsArray", newArray);
-                mountainParent.SetColorDataToShader();
+                for (int i = 0; i < environmentLightGroups.Count; i++)
+                {
+                    Color colorForGroup = activelyLoadedSettings.LightGroupSettings[i].GroupColor;
+                    this.SetColorForGroup(environmentLightGroups[i], colorForGroup);
+                }
             }
 
             this.previewerDidFinishEvent(true);

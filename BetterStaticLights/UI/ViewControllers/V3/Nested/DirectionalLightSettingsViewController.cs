@@ -1,6 +1,5 @@
 ﻿using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.ViewControllers;
-using BetterStaticLights.UI.FlowCoordinators;
 using Zenject;
 
 namespace BetterStaticLights.UI.ViewControllers.V3.Nested

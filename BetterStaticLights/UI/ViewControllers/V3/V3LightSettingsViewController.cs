@@ -4,7 +4,6 @@ using BeatSaberMarkupLanguage.ViewControllers;
 using BetterStaticLights.UI.FlowCoordinators;
 using BetterStaticLights.UI.ViewControllers.V3.Nested;
 using SiraUtil.Logging;
-using System.Linq;
 using Zenject;
 
 namespace BetterStaticLights.UI.ViewControllers.V3

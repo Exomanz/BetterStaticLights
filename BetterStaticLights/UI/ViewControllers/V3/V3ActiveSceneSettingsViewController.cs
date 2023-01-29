@@ -5,9 +5,7 @@ using BeatSaberMarkupLanguage.ViewControllers;
 using BetterStaticLights.Configuration;
 using Polyglot;
 using SiraUtil.Logging;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -19,6 +17,7 @@ namespace BetterStaticLights.UI.ViewControllers.V3
     public class V3ActiveSceneSettingsViewController : BSMLAutomaticViewController
     {
         [Inject] private readonly SiraLog logger;
+        [Inject] private readonly V3LightSettingsViewController lightSettingsView;
         [Inject] private readonly MockSceneTransitionHelper transitionHelper;
 
         private PreviewerConfigurationData previewerConfigurationData;
@@ -84,7 +83,9 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         private void ApplyScene()
         {
             environmentSetting = MockSceneTransitionHelper.GetSerializableSceneName(envListSetting.Value.ToString());
+            lightSettingsView.HandleSubmenuButtonWasPressed(false);
             applySceneButton.interactable = false;
+
             transitionHelper.RefreshPreviewer(true, previewerConfigurationData.environmentKey);
         }
 
@@ -100,7 +101,7 @@ namespace BetterStaticLights.UI.ViewControllers.V3
 #pragma warning restore IDE0051
         #endregion
 
-        [Inject] 
+        [Inject]
         internal void Construct(PluginConfig config, PlayerDataModel dataModel)
         {
             this.previewerConfigurationData = config.PreviewerConfigurationData;

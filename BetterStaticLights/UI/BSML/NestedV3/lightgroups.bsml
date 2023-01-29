@@ -3,4 +3,13 @@
 	>
 	<button text='&lt; Back'
 			on-click='back-button-was-pressed'/>
+	<vertical bg='round-rect-panel'
+			  bg-color='#000000DD'
+			  vertical-fit='PreferredSize'
+			  pref-width='90'>
+		<dropdown-list-setting id='lightgroup-list-setting-dropdown'
+							   text='Group ID'
+					  value='lightgroup-list-value'
+					  choices='lightgroup-list-choices'/>
+	</vertical>
 </bg>
