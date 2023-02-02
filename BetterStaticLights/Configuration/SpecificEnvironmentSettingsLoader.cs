@@ -62,7 +62,7 @@ namespace BetterStaticLights.Configuration
 
                 for (int i = 0; i < _directionalLightsCount; i++)
                 {
-                    this._directionalLightSettings.Add(new DirectionalLightSettings(true, i, Color.white));
+                    this._directionalLightSettings.Add(new DirectionalLightSettings(i, true, Color.white));
                 }
             }
         }
@@ -70,67 +70,58 @@ namespace BetterStaticLights.Configuration
         public partial class LightGroupSettings
         {
             private int _groupId;
-            private bool _enabled;
-            private float _brightness;
-            private Color _groupColor;
 
             public int GroupId => _groupId;
-            public bool Enabled => _enabled;
-            public float Brightness => _brightness;
-            [JsonConverter(typeof(UnityColorConverter))] public Color GroupColor => _groupColor;
+            public float Brightness;
+            [JsonConverter(typeof(UnityColorConverter))] public Color GroupColor;
 
             public LightGroupSettings(int groupId, Color groupColor) :
-                this(groupId, true, 1f, groupColor)
+                this(groupId, 1f, groupColor)
             { }
 
             [JsonConstructor]
-            internal LightGroupSettings(int groupId, bool enabled, float brightness, Color groupColor)
+            internal LightGroupSettings(int groupId, float brightness, Color groupColor)
             {
                 _groupId = groupId;
-                _enabled = enabled;
-                _groupColor = groupColor;
+                Brightness = brightness;
+                GroupColor = groupColor;
 
                 if (brightness > 1)
                 {
-                    _brightness = brightness /= brightness;
+                    Brightness = 1;
                 }
             }
         }
 
         public partial class DirectionalLightSettings
         {
-            private bool _enabled;
             private int _lightId;
-            private Color _lightColor;
 
-            public bool Enabled => _enabled;
             public int LightId => _lightId;
-            [JsonConverter(typeof(UnityColorConverter))] public Color LightColor => _lightColor;
+            public bool Enabled;
+            [JsonConverter(typeof(UnityColorConverter))] public Color LightColor;
 
             public DirectionalLightSettings() :
-                this(true, 0, Color.black)
+                this(0, true, Color.black)
             { }
 
             public DirectionalLightSettings(int groupId) :
-                this(true, groupId, Color.black)
+                this(groupId, true, Color.black)
             { }
 
             [JsonConstructor]
-            internal DirectionalLightSettings(bool enabled, int lightId, Color lightColor)
+            internal DirectionalLightSettings(int lightId, bool enabled, Color lightColor)
             {
-                _enabled = enabled;
                 _lightId = lightId;
-                _lightColor = lightColor;
+                Enabled = enabled;
+                LightColor = lightColor;
             }
         }
 
         public partial class GradientLightSettings
         {
-            private bool _enabled;
-            private Color _lightColor;
-
-            public bool Enabled => _enabled;
-            [JsonConverter(typeof(UnityColorConverter))] public Color LightColor => _lightColor;
+            public bool Enabled;
+            [JsonConverter(typeof(UnityColorConverter))] public Color LightColor;
 
             public GradientLightSettings() :
                 this(true, Color.black)
@@ -139,8 +130,8 @@ namespace BetterStaticLights.Configuration
             [JsonConstructor]
             internal GradientLightSettings(bool enabled, Color lightColor)
             {
-                _enabled = enabled;
-                _lightColor = lightColor;
+                Enabled = enabled;
+                LightColor = lightColor;
             }
         }
 
@@ -262,12 +253,9 @@ namespace BetterStaticLights.Configuration
             return default;
         }
 
-        internal async Task SaveEnvironmentSettings(SpecificEnvironmentSettings environmentSettings)
+        internal async Task SaveEnvironmentSettings(SpecificEnvironmentSettings environmentSettings = null)
         {
-            if (environmentSettings == null)
-            {
-                throw new ArgumentNullException(nameof(environmentSettings));
-            }
+            environmentSettings ??= this.activelyLoadedSettings;
 
             string fileName = environmentSettings.EnvironmentName + ".json";
             string pathToWriteTo = Path.Combine(LoaderConstants.ConfigurationPath, fileName);

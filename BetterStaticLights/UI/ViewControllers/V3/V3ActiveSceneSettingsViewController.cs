@@ -21,9 +21,6 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         [Inject] private readonly MockSceneTransitionHelper transitionHelper;
 
         private PreviewerConfigurationData previewerConfigurationData;
-        private ColorSchemesSettings colorSchemesSettings;
-        private List<object> serializedColorSchemeIds = new List<object>();
-        private Dictionary<string, string> localizedToSerializedColorSchemeIds = new Dictionary<string, string>();
 
         #region BSML
         [UIParams] private readonly BSMLParserParams parser;
@@ -37,33 +34,17 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         [UIComponent("environment-list-setting")]
         public DropDownListSetting envListSetting;
 
-        [UIComponent("colorscheme-list-setting")]
-        public DropDownListSetting colorSchemeListSetting;
-
         [UIComponent("apply-scene-button")]
         public Button applySceneButton;
 
-        [UIComponent("apply-color-scheme-button")]
-        public Button applyColorSchemeButton;
-
         [UIValue("v3-environment-list")]
         public List<object> v3Environments => MockSceneTransitionHelper.v3Environments;
-
-        [UIValue("color-schemes")]
-        public List<object> colorSchemesList = new List<object>();
 
         [UIValue("env-setting")]
         public string environmentSetting
         {
             get => MockSceneTransitionHelper.GetNormalizedSceneName(previewerConfigurationData.environmentKey);
             set => previewerConfigurationData.environmentKey = value;
-        }
-
-        [UIValue("colorscheme-setting")]
-        public string colorSchemeSetting
-        {
-            get => previewerConfigurationData.colorSchemeKey;
-            set => previewerConfigurationData.colorSchemeKey = value;
         }
 
 #pragma warning disable IDE0051 // Events called by BSML
@@ -73,28 +54,12 @@ namespace BetterStaticLights.UI.ViewControllers.V3
             applySceneButton.interactable = !string.Equals(previewerConfigurationData.environmentKey, MockSceneTransitionHelper.GetSerializableSceneName(value));
         }
 
-        [UIAction("handle-color-scheme-did-change")]
-        private void ColorSchemeDidChangeEvent(string value)
-        {
-            applyColorSchemeButton.interactable = !string.Equals(previewerConfigurationData.colorSchemeKey, localizedToSerializedColorSchemeIds[value]);
-        }
-
         [UIAction("save-and-apply-env-setting")]
         private void ApplyScene()
         {
             environmentSetting = MockSceneTransitionHelper.GetSerializableSceneName(envListSetting.Value.ToString());
-            lightSettingsView.HandleSubmenuButtonWasPressed(false);
             applySceneButton.interactable = false;
 
-            transitionHelper.RefreshPreviewer(true, previewerConfigurationData.environmentKey);
-        }
-
-        [UIAction("save-and-apply-color-scheme")]
-        private void ApplyColorScheme()
-        {
-            colorSchemeSetting = localizedToSerializedColorSchemeIds[colorSchemeListSetting.Value.ToString()];
-            colorSchemesSettings.selectedColorSchemeId = colorSchemeSetting;
-            applyColorSchemeButton.interactable = false;
             transitionHelper.RefreshPreviewer(true, previewerConfigurationData.environmentKey);
         }
 
@@ -105,26 +70,6 @@ namespace BetterStaticLights.UI.ViewControllers.V3
         internal void Construct(PluginConfig config, PlayerDataModel dataModel)
         {
             this.previewerConfigurationData = config.PreviewerConfigurationData;
-            this.colorSchemesSettings = dataModel.playerData.colorSchemesSettings;
-            colorSchemesList.Clear();
-
-            for (int i = 0; i < colorSchemesSettings.GetNumberOfColorSchemes(); i++)
-            {
-                ColorScheme schemeAtIdx = colorSchemesSettings.GetColorSchemeForIdx(i);
-                serializedColorSchemeIds.Add(schemeAtIdx.colorSchemeId);
-
-                if (schemeAtIdx.useNonLocalizedName)
-                {
-                    colorSchemesList.Add(schemeAtIdx.nonLocalizedName);
-                    localizedToSerializedColorSchemeIds.Add(schemeAtIdx.nonLocalizedName, schemeAtIdx.colorSchemeId);
-                }
-                else
-                {
-                    string localizedName = Localization.Get(schemeAtIdx.colorSchemeNameLocalizationKey);
-                    colorSchemesList.Add(localizedName);
-                    localizedToSerializedColorSchemeIds.Add(localizedName, schemeAtIdx.colorSchemeId);
-                }
-            }
         }
 
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)

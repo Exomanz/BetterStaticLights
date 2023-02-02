@@ -21,7 +21,7 @@ namespace BetterStaticLights
         #endregion
 
         #region V3
-        public virtual PreviewerConfigurationData PreviewerConfigurationData { get; set; } = new PreviewerConfigurationData("WeaveEnvironment", "TheFirst", true);
+        public virtual PreviewerConfigurationData PreviewerConfigurationData { get; set; } = new PreviewerConfigurationData("WeaveEnvironment", true);
         #endregion
     }
 }

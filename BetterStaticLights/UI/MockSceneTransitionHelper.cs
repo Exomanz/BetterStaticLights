@@ -8,6 +8,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions.Must;
 using UnityEngine.SceneManagement;
 using Zenject;
 
@@ -72,8 +73,8 @@ namespace BetterStaticLights.UI
         public List<LightGroup> environmentLightGroups = new List<LightGroup>(501);
         public List<DirectionalLight> directionalLights = new List<DirectionalLight>();
         public BloomPrePassBackgroundColorsGradient gradientBackground = null!;
+        public SpecificEnvironmentSettingsLoader.SpecificEnvironmentSettings activelyLoadedSettings;
 
-        private SpecificEnvironmentSettingsLoader.SpecificEnvironmentSettings activelyLoadedSettings;
         private List<GameObject> mockSceneObjects = new List<GameObject>();
         private List<GameObject> importantMenuObjects = new List<GameObject>();
         private PreviewerConfigurationData previewerData;
@@ -262,6 +263,7 @@ namespace BetterStaticLights.UI
             mockSceneObjects.ForEach(obj => obj.SetActive(isEnteringPreviewState));
             importantMenuObjects.ForEach(obj => obj.SetActive(!isEnteringPreviewState));
 
+            // I have to do this after showing the objects because the OnEnable() method in the ColorArrayLightWithIds resets the array I need to modify.
             if (isEnteringPreviewState)
             {
                 if (environmentName == "RockMixtapeEnvironment")
@@ -287,18 +289,20 @@ namespace BetterStaticLights.UI
                 for (int i = 0; i < environmentLightGroups.Count; i++)
                 {
                     Color colorForGroup = activelyLoadedSettings.LightGroupSettings[i].GroupColor;
+                    colorForGroup = colorForGroup.ColorWithAlpha(activelyLoadedSettings.LightGroupSettings[i].Brightness);
                     this.SetColorForGroup(environmentLightGroups[i], colorForGroup);
                 }
             }
 
-            this.previewerDidFinishEvent(true);
+            this.previewerDidFinishEvent(isEnteringPreviewState);
             yield break;
         }
 
-        private void SetColorForGroup(LightGroup group, Color color)
+        public void SetColorForGroup(LightGroup group, Color color)
         {
             int offset = group.startLightId;
             int numberOfElements = group.numberOfElements;
+            
 
             for (int i = offset; i < offset + numberOfElements; i++)
                 this.lightManager.SetColorForId(i, color);

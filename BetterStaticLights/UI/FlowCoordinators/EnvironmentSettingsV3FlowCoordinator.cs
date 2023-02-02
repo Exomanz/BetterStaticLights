@@ -30,10 +30,5 @@ namespace BetterStaticLights.UI.FlowCoordinators
             transitionHelper?.RefreshPreviewer(false);
             mainModFlowCoordinator.DismissFlowCoordinator(this, null, ViewController.AnimationDirection.Vertical);
         }
-
-        public void ReplaceRightScreenViewController(ViewController viewController, ViewController.AnimationType animationType)
-        {
-            base.SetRightScreenViewController(viewController, animationType);
-        }
     }
 }

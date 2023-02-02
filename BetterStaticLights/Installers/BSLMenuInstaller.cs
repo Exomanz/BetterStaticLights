@@ -3,7 +3,6 @@ using BetterStaticLights.UI.FlowCoordinators;
 using BetterStaticLights.UI.ViewControllers;
 using BetterStaticLights.UI.ViewControllers.V2;
 using BetterStaticLights.UI.ViewControllers.V3;
-using BetterStaticLights.UI.ViewControllers.V3.Nested;
 using HMUI;
 using UnityEngine;
 using Zenject;
@@ -29,10 +28,6 @@ namespace BetterStaticLights.Installers
             Container.BindInterfacesAndSelfTo<MockSceneTransitionHelper>().AsSingle();
             BindViewController<V3LightSettingsViewController>();
             BindViewController<V3ActiveSceneSettingsViewController>();
-
-            // Nested V3 ViewControllers
-            BindViewController<LightGroupSettingsViewController>();
-            BindViewController<DirectionalLightSettingsViewController>();
 
             Container.BindInterfacesAndSelfTo<MenuButtonManager>().AsSingle().NonLazy();
         }

@@ -1,39 +1,31 @@
 ﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' 
 	xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ 
 	https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
-	<vertical vertical-fit='PreferredSize'
-			  spacing='5'
-			  anchor-pos-y='5'>
-		<vertical bg='panel-top'
-				  bg-color='#00FFFF'
-				  pref-width='110'
-				  vertical-fit='PreferredSize'
-				  pad-top='1'
-				  pad-bottom='1'>
-			<vertical bg='panel-top'
-					  bg-color='#000000'
-					  pref-width='108'
-					  vertical-fit='PreferredSize'
-					  pad-top='1'>
-				<text text='Settings'
-					  font-size='7'
-					  italics='True'
-					  align='Center'/>
-			</vertical>
-		</vertical>
+	<vertical vertical-fit='PreferredSize'>
 		<vertical bg='round-rect-panel'
 				  bg-color='#000000DD'
 				  vertical-fit='PreferredSize'
 				  pref-width='95'
 				  pad='3'>
-			<button text='Light Group Settings'
-					on-click='lightgroups-button-was-pressed'
-					pref-width='36'/>
+			<dropdown-list-setting id='light-group-component'
+								   value='light-group-value'
+								   choices='light-group-choices'
+								   text='Group ID'
+								   on-change='update-view-for-group'/>
+			<color-setting id='group-color-setting'
+						   value='color-for-group-id'
+						   text='Color'
+						   apply-on-change='True'
+						   get-event='refresh-view'/>
+			<slider-setting id='group-brightness-component'
+							value='brightness-for-group-id'
+							min='0'
+							max='1'
+							increment='0.01'
+							text='Brightness'
+							get-event='refresh-view'
+							apply-on-change='True'/>
 
-			<button text='Directional Light Settings'
-					on-click='directionals-button-was-pressed'
-					pref-width='43'
-					interactable='~should-directionals-button-be-active'/>
 		</vertical>
 	</vertical>
 </bg>

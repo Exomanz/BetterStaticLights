@@ -167,8 +167,6 @@
     <Compile Include="UI\ViewControllers\MainBSLViewController.cs" />
     <Compile Include="UI\ViewControllers\V2\V2LightSettingsViewController.cs" />
     <Compile Include="UI\ViewControllers\V2\V2InfoViewController.cs" />
-    <Compile Include="UI\ViewControllers\V3\Nested\DirectionalLightSettingsViewController.cs" />
-    <Compile Include="UI\ViewControllers\V3\Nested\LightGroupSettingsViewController.cs" />
     <Compile Include="UI\ViewControllers\V3\V3ActiveSceneSettingsViewController.cs" />
     <Compile Include="UI\ViewControllers\V3\V3LightSettingsViewController.cs" />
   </ItemGroup>
@@ -184,8 +182,6 @@
     <EmbeddedResource Include="UI\BSML\v2settings.bsml" />
     <EmbeddedResource Include="UI\BSML\v3settings.bsml" />
     <EmbeddedResource Include="UI\BSML\v3scene.bsml" />
-    <EmbeddedResource Include="UI\BSML\NestedV3\lightgroups.bsml" />
-    <EmbeddedResource Include="UI\BSML\NestedV3\directionals.bsml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BeatSaberModdingTools.Tasks">

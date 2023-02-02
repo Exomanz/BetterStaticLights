@@ -24,12 +24,6 @@
 					  choices='v3-environment-list'
 					  value='env-setting'
 					  on-change='handle-list-did-change'/>
-		<dropdown-list-setting id='colorscheme-list-setting'
-							   text='Color Scheme'
-							   choices='color-schemes'
-							   value='colorscheme-setting'
-							   on-change='handle-color-scheme-did-change'
-							   hover-hint='&lt;color=#FF5555&gt;NOTE:&lt;/color&gt; Applying a color scheme here will also apply it to your player data for easy configuration.'/>
 		<horizontal>
 			<button id='apply-scene-button' 
 					text='Apply Scene'
@@ -37,12 +31,6 @@
 					interactable='False'
 					pref-width='25'
 					on-click='save-and-apply-env-setting'/>
-			<button id='apply-color-scheme-button'
-					text='Apply Color Scheme'
-					face-color='#55FFFF'
-					interactable='False'
-					pref-width='35'
-					on-click='save-and-apply-color-scheme'/>
 		</horizontal>
 	</vertical>
 </bg>
