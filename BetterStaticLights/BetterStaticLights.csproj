@@ -165,10 +165,9 @@
     <Compile Include="UI\MenuButtonManager.cs" />
     <Compile Include="UI\MockSceneTransitionHelper.cs" />
     <Compile Include="UI\ViewControllers\MainBSLViewController.cs" />
-    <Compile Include="UI\ViewControllers\V2\V2LightSettingsViewController.cs" />
-    <Compile Include="UI\ViewControllers\V2\V2InfoViewController.cs" />
-    <Compile Include="UI\ViewControllers\V3\V3ActiveSceneSettingsViewController.cs" />
-    <Compile Include="UI\ViewControllers\V3\V3LightSettingsViewController.cs" />
+    <Compile Include="UI\ViewControllers\V2LightSettingsViewController.cs" />
+    <Compile Include="UI\ViewControllers\V2InfoViewController.cs" />
+    <Compile Include="UI\ViewControllers\V3ActiveSceneSettingsViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="manifest.json" />
@@ -180,7 +179,6 @@
     <EmbeddedResource Include="UI\BSML\home.bsml" />
     <EmbeddedResource Include="UI\BSML\v2info.bsml" />
     <EmbeddedResource Include="UI\BSML\v2settings.bsml" />
-    <EmbeddedResource Include="UI\BSML\v3settings.bsml" />
     <EmbeddedResource Include="UI\BSML\v3scene.bsml" />
   </ItemGroup>
   <ItemGroup>
@@ -193,5 +191,6 @@
   <ItemGroup>
     <None Include="EnvironmentLightGroupMappings.md" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

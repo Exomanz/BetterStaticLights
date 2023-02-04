@@ -40,6 +40,7 @@ namespace BetterStaticLights.UI.ViewControllers
             }
             else if (settingsVersion == "V3")
             {
+                config.PreviewerConfigurationData.isFirstTimePreviewingEver = false;
                 parser.EmitEvent("hide-all");
                 parentFlowCoordinator.PresentFlowCoordinator(v3FlowCoordinator, null, AnimationDirection.Vertical);
             }
@@ -50,7 +51,6 @@ namespace BetterStaticLights.UI.ViewControllers
         {
             if (config.PreviewerConfigurationData.isFirstTimePreviewingEver)
             {
-                config.PreviewerConfigurationData.isFirstTimePreviewingEver = false;
                 parser.EmitEvent("show-scene-load-modal");
             }
             else this._OnButtonPress("V3");

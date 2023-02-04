@@ -1,5 +1,5 @@
 ﻿using BeatSaberMarkupLanguage;
-using BetterStaticLights.UI.ViewControllers.V2;
+using BetterStaticLights.UI.ViewControllers;
 using HMUI;
 using Zenject;
 

@@ -74,6 +74,7 @@ namespace BetterStaticLights.UI
         public List<DirectionalLight> directionalLights = new List<DirectionalLight>();
         public BloomPrePassBackgroundColorsGradient gradientBackground = null!;
         public SpecificEnvironmentSettingsLoader.SpecificEnvironmentSettings activelyLoadedSettings;
+        public FieldAccessor<ColorArrayLightWithIds, Vector4[]>.Accessor colorsArrayAccessor = FieldAccessor<ColorArrayLightWithIds, Vector4[]>.GetAccessor("_colorsArray");
 
         private List<GameObject> mockSceneObjects = new List<GameObject>();
         private List<GameObject> importantMenuObjects = new List<GameObject>();
@@ -269,7 +270,7 @@ namespace BetterStaticLights.UI
                 if (environmentName == "RockMixtapeEnvironment")
                 {
                     ColorArrayLightWithIds mountainParent = GameObject.Find("Mountains").GetComponent<ColorArrayLightWithIds>();
-                    Vector4[] colorsArray = mountainParent.GetField<Vector4[], ColorArrayLightWithIds>("_colorsArray");
+                    Vector4[] colorsArray = colorsArrayAccessor(ref mountainParent);
                     Vector4[] newArray = new Vector4[colorsArray.Length];
 
                     for (int i = 0; i < newArray.Length; i++)
@@ -303,7 +304,6 @@ namespace BetterStaticLights.UI
             int offset = group.startLightId;
             int numberOfElements = group.numberOfElements;
             
-
             for (int i = offset; i < offset + numberOfElements; i++)
                 this.lightManager.SetColorForId(i, color);
         }

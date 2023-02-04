@@ -1,5 +1,5 @@
 ﻿using BeatSaberMarkupLanguage;
-using BetterStaticLights.UI.ViewControllers.V3;
+using BetterStaticLights.UI.ViewControllers;
 using HMUI;
 using Zenject;
 
@@ -8,11 +8,8 @@ namespace BetterStaticLights.UI.FlowCoordinators
     internal class EnvironmentSettingsV3FlowCoordinator : FlowCoordinator
     {
         [Inject] private readonly BSLParentFlowCoordinator mainModFlowCoordinator;
-        [Inject] private readonly MockSceneTransitionHelper transitionHelper;
-
-        // Main ViewControllers
-        [Inject] private readonly V3LightSettingsViewController settingsViewController;
         [Inject] private readonly V3ActiveSceneSettingsViewController sceneViewController;
+        [Inject] private readonly MockSceneTransitionHelper transitionHelper;
 
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
@@ -20,7 +17,7 @@ namespace BetterStaticLights.UI.FlowCoordinators
             {
                 this.SetTitle("Environment Settings - V3");
                 this.showBackButton = true;
-                base.ProvideInitialViewControllers(sceneViewController, null, settingsViewController);
+                base.ProvideInitialViewControllers(sceneViewController);
             }
         }
 

@@ -2,10 +2,10 @@
 using BeatSaberMarkupLanguage.ViewControllers;
 using Zenject;
 
-namespace BetterStaticLights.UI.ViewControllers.V2
+namespace BetterStaticLights.UI.ViewControllers
 {
     [ViewDefinition("BetterStaticLights.UI.BSML.v2settings.bsml")]
-    [HotReload(RelativePathToLayout = "../../BSML/v2settings.bsml")]
+    [HotReload(RelativePathToLayout = "../BSML/v2settings.bsml")]
     public class V2LightSettingsViewController : BSMLAutomaticViewController
     {
         [Inject] private readonly PluginConfig config;

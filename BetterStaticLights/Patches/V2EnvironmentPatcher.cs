@@ -14,7 +14,6 @@ namespace BetterStaticLights.Patches
         [AffinityPrefix]
         public bool Prefix(ref BeatmapData beatmapData, ref BeatmapEventDataBoxGroupLists beatmapEventDataBoxGroupLists, ref DefaultEnvironmentEvents defaultEnvironmentEvents, ref EnvironmentLightGroups environmentLightGroups)
         {
-            // V2 Environment Patching
             if (defaultEnvironmentEvents == null || defaultEnvironmentEvents.isEmpty)
             {
                 foreach (LightSetV2 v2 in config.lightSets)

@@ -1,8 +1,6 @@
 ﻿using BetterStaticLights.UI;
 using BetterStaticLights.UI.FlowCoordinators;
 using BetterStaticLights.UI.ViewControllers;
-using BetterStaticLights.UI.ViewControllers.V2;
-using BetterStaticLights.UI.ViewControllers.V3;
 using HMUI;
 using UnityEngine;
 using Zenject;
@@ -13,23 +11,17 @@ namespace BetterStaticLights.Installers
     {
         public override void InstallBindings()
         {
+            Container.BindInterfacesAndSelfTo<MockSceneTransitionHelper>().AsSingle();
+            Container.BindInterfacesAndSelfTo<MenuButtonManager>().AsSingle().NonLazy();
+
             Container.Bind<BSLParentFlowCoordinator>().FromNewComponentOn(new GameObject("BSL - Parent FlowCoordinator")).AsSingle();
             Container.Bind<EnvironmentSettingsV2FlowCoordinator>().FromNewComponentOn(new GameObject("BSL - V2 Settings FlowCoordinator")).AsSingle();
             Container.Bind<EnvironmentSettingsV3FlowCoordinator>().FromNewComponentOn(new GameObject("BSL - V3 Settings FlowCoordinator")).AsSingle();
 
-            // Settings Host
             BindViewController<MainBSLViewController>();
-
-            // V2
             BindViewController<V2LightSettingsViewController>();
             BindViewController<V2InfoViewController>();
-
-            // V3
-            Container.BindInterfacesAndSelfTo<MockSceneTransitionHelper>().AsSingle();
-            BindViewController<V3LightSettingsViewController>();
             BindViewController<V3ActiveSceneSettingsViewController>();
-
-            Container.BindInterfacesAndSelfTo<MenuButtonManager>().AsSingle().NonLazy();
         }
 
         private void BindViewController<T>() where T : ViewController
