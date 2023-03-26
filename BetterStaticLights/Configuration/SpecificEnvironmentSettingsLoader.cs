@@ -138,7 +138,7 @@ namespace BetterStaticLights.Configuration
         private static class LoaderConstants
         {
             public static string ConfigurationPath => Path.Combine(UnityGame.UserDataPath, "BetterStaticLights");
-            public static string[] FileNames => new string[7] { "WeaveEnvironment", "PyroEnvironment", "EDMEnvironment", "TheSecondEnvironment", "LizzoEnvironment", "TheWeekndEnvironment", "RockMixtapeEnvironment" };
+            public static string[] FileNames => new string[8] { "WeaveEnvironment", "PyroEnvironment", "EDMEnvironment", "TheSecondEnvironment", "LizzoEnvironment", "TheWeekndEnvironment", "RockMixtapeEnvironment", "Dragons2Environment" };
             public static Dictionary<string, SpecificEnvironmentSettings> SpecificEnvironmentSettingsDictionary => new Dictionary<string, SpecificEnvironmentSettings>()
             {
                 { "WeaveEnvironment", new SpecificEnvironmentSettings("WeaveEnvironment", 16) },
@@ -148,6 +148,7 @@ namespace BetterStaticLights.Configuration
                 { "LizzoEnvironment", new SpecificEnvironmentSettings("LizzoEnvironment", 20, 4, new GradientLightSettings()) },
                 { "TheWeekndEnvironment", new SpecificEnvironmentSettings("TheWeekndEnvironment", 35, 4, new GradientLightSettings()) },
                 { "RockMixtapeEnvironment", new SpecificEnvironmentSettings("RockMixtapeEnvironment", 38, 4, new GradientLightSettings()) },
+                { "Dragons2Environment", new SpecificEnvironmentSettings("Dragons2Environment", 12) }
             };
         }
 
@@ -235,6 +236,7 @@ namespace BetterStaticLights.Configuration
                 throw new ArgumentException("Associated settings file does not exist.", nameof(fileName));
             }
 
+            // Append an extension
             fileName += ".json";
             string pathToReadFrom = Path.Combine(LoaderConstants.ConfigurationPath, fileName);
             try

@@ -13,7 +13,7 @@
 	<vertical id='settings-parent'
 			  active='False'
 			  bg='round-rect-panel'
-			  bg-color='#000000CC'
+			  bg-color='#000000EF'
 			  vertical-fit='PreferredSize'
 			  pref-width='110'
 			  pad='3'
@@ -50,9 +50,8 @@
 						text='Brightness'
 						apply-on-change='True'
 						get-event='refresh-view'/>
-		<button text='More'
+		<button text='More >'
 				hover-hint='Access settings for Directional Lights, Gradient Backgrounds, and more'
-				pref-width='25'
-				face-color='#55FFFF'/>
+				pref-width='25'/>
 	</vertical>
 </bg>

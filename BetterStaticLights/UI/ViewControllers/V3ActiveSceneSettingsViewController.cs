@@ -3,7 +3,6 @@ using BeatSaberMarkupLanguage.Components.Settings;
 using BeatSaberMarkupLanguage.Parser;
 using BeatSaberMarkupLanguage.ViewControllers;
 using BetterStaticLights.Configuration;
-using Polyglot;
 using SiraUtil.Logging;
 using System.Collections.Generic;
 using System.Linq;
@@ -161,17 +160,14 @@ namespace BetterStaticLights.UI.ViewControllers
 
             if (groupListSettingComponent != null && state)
             {
-                this.activeEnvironmentSettings = transitionHelper.activelyLoadedSettings;
                 _groupId = 0;
+                this.activeEnvironmentSettings = transitionHelper.activelyLoadedSettings;
                 lightGroupChoices = Enumerable.Range(0, transitionHelper.environmentLightGroups.Count).Cast<object>().ToList();
-                if (activeEnvironmentSettings.EnvironmentName == "PyroEnvironment")
-                {
-                    // These two groups don't exist anymore after loading the environment and the previewer shits itself if you try to modify them
-                    // The size of the collection shrinks after the first call so I have to remove the 6th index twice lol
-                    // This may not look intentional but it totally is you gotta trust me
-                    lightGroupChoices.RemoveAt(6);
-                    lightGroupChoices.RemoveAt(6);
-                }
+                lightGroupChoices.RemoveAll(match => {
+                    logger.Info(match);
+                    return transitionHelper.ignoredLightGroups.Contains(int.Parse(match.ToString()));
+                });
+
                 groupListSettingComponent.values = lightGroupChoices;
                 groupListSettingComponent.UpdateChoices();
                 groupListSettingComponent.dropdown.SelectCellWithIdx(0);

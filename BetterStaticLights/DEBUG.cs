@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -32,6 +33,7 @@ namespace BetterStaticLights
         {
             if (arg1.name == "GameCore")
             {
+                SceneManager.GetAllScenes().ToList().ForEach(scene => Plugin.Instance.Logger.Info(scene.name));
                 var objs = Resources.FindObjectsOfTypeAll<LightGroup>();
                 foreach (var x in objs)
                 {
