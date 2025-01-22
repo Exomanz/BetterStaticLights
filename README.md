@@ -1,4 +1,2 @@
-# Big changes are coming...
-View my progress over on the [dev branch](../../tree/dev).
-
-Follow the related [issue](../../issues/5) to be notified when it's ready.
+# This Project has been Archived
+[BetterLegacyLights](https://github.com/Exomanz/BetterLegacyLights) is this mod's spiritual successor. V2 may or may not ever be finished.
